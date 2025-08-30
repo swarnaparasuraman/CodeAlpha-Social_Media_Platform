@@ -1,0 +1,502 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ post.author.username }} - Glintz{% endblock %}
+
+{% block content %}
+{% csrf_token %}
+<div class="bg-gray-50 min-h-screen">
+    <!-- Instagram-style Layout -->
+    <div class="flex">
+        <!-- Left Sidebar Navigation -->
+        <div class="fixed left-0 top-0 h-full w-64 bg-white border-r border-gray-200 z-40 hidden lg:block">
+            <div class="p-6">
+                <!-- Logo -->
+                <div class="mb-8">
+                    <h1 class="text-2xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 bg-clip-text text-transparent">Glintz</h1>
+                </div>
+
+                <!-- Navigation Menu -->
+                <nav class="space-y-2">
+                    <a href="{% url 'posts:feed' %}" class="flex items-center space-x-3 px-3 py-3 rounded-lg hover:bg-gray-100 text-gray-600">
+                        <i data-lucide="home" class="w-6 h-6"></i>
+                        <span>Home</span>
+                    </a>
+                    <a href="{% url 'accounts:search_users' %}" class="flex items-center space-x-3 px-3 py-3 rounded-lg hover:bg-gray-100 text-gray-600">
+                        <i data-lucide="search" class="w-6 h-6"></i>
+                        <span>Search</span>
+                    </a>
+                    <a href="{% url 'posts:explore' %}" class="flex items-center space-x-3 px-3 py-3 rounded-lg hover:bg-gray-100 text-gray-600">
+                        <i data-lucide="compass" class="w-6 h-6"></i>
+                        <span>Explore</span>
+                    </a>
+                    <a href="{% url 'posts:reels' %}" class="flex items-center space-x-3 px-3 py-3 rounded-lg hover:bg-gray-100 text-gray-600">
+                        <i data-lucide="video" class="w-6 h-6"></i>
+                        <span>Reels</span>
+                    </a>
+                    <a href="{% url 'posts:create' %}" class="flex items-center space-x-3 px-3 py-3 rounded-lg hover:bg-gray-100 text-gray-600">
+                        <i data-lucide="plus-square" class="w-6 h-6"></i>
+                        <span>Create</span>
+                    </a>
+                    <a href="{% url 'accounts:profile' user.username %}" class="flex items-center space-x-3 px-3 py-3 rounded-lg hover:bg-gray-100 text-gray-600">
+                        <img src="{{ user.profile.profile_picture.url }}" alt="Profile" class="w-6 h-6 rounded-full object-cover">
+                        <span>Profile</span>
+                    </a>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Mobile Header -->
+        <div class="lg:hidden bg-white border-b border-gray-200 px-4 py-3 fixed top-0 left-0 right-0 z-50">
+            <div class="flex items-center justify-between">
+                <a href="{% url 'posts:explore' %}" class="text-gray-600">
+                    <i data-lucide="arrow-left" class="w-6 h-6"></i>
+                </a>
+                <h1 class="text-lg font-semibold">Post</h1>
+                <div class="flex items-center space-x-4">
+                    <button class="text-gray-600">
+                        <i data-lucide="heart" class="w-6 h-6"></i>
+                    </button>
+                    <button class="text-gray-600">
+                        <i data-lucide="send" class="w-6 h-6"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 lg:ml-64 pt-16 lg:pt-0">
+            <div class="max-w-4xl mx-auto">
+                <!-- Post Container -->
+                <div class="bg-white border border-gray-200 rounded-2xl shadow-lg overflow-hidden mx-4 my-8">
+                    <!-- Post Header -->
+                    <div class="p-6 border-b border-gray-100">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-4">
+                                <div class="relative">
+                                    <div class="w-14 h-14 rounded-full p-0.5 bg-gradient-to-tr from-pink-500 via-purple-500 to-cyan-500">
+                                        <a href="{% url 'accounts:profile' post.author.username %}">
+                                            <img src="{{ post.author.profile.profile_picture.url }}"
+                                                 alt="{{ post.author.username }}"
+                                                 class="w-full h-full rounded-full border-2 border-white object-cover">
+                                        </a>
+                                    </div>
+                                    {% if post.author.profile.verified %}
+                                    <div class="absolute -bottom-1 -right-1 w-6 h-6 bg-blue-500 rounded-full border-2 border-white flex items-center justify-center">
+                                        <i data-lucide="check" class="w-3 h-3 text-white"></i>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <a href="{% url 'accounts:profile' post.author.username %}"
+                                       class="font-bold text-gray-900 hover:text-gray-700 text-lg">
+                                        {{ post.author.username }}
+                                    </a>
+                                    <p class="text-gray-500 text-sm">{{ post.time_since_posted }}</p>
+                                </div>
+                            </div>
+
+                            {% if post.author == user %}
+                            <div class="relative group">
+                                <button class="text-gray-400 hover:text-gray-600 p-2">
+                                    <i data-lucide="more-horizontal" class="w-6 h-6"></i>
+                                </button>
+                                <div class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10">
+                                    <a href="{% url 'posts:edit' post.pk %}" class="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 rounded-t-xl">
+                                        <i data-lucide="edit" class="w-4 h-4 mr-3"></i>Edit
+                                    </a>
+                                    <a href="{% url 'posts:delete' post.pk %}" class="flex items-center px-4 py-3 text-sm text-red-600 hover:bg-gray-50 rounded-b-xl">
+                                        <i data-lucide="trash-2" class="w-4 h-4 mr-3"></i>Delete
+                                    </a>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Post Image -->
+                    {% if post.image %}
+                    <div class="relative">
+                        <img src="{{ post.image.url }}"
+                             alt="Post image"
+                             class="w-full max-h-[600px] object-cover">
+                    </div>
+                    {% endif %}
+
+                    <!-- Post Actions -->
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center space-x-6">
+                                <!-- Like Button -->
+                                <button onclick="likePost({{ post.pk }})"
+                                        class="group flex items-center space-x-2 transition-all duration-200">
+                                    <div class="w-10 h-10 rounded-full flex items-center justify-center group-hover:bg-red-50 transition-colors duration-200">
+                                        <i data-lucide="heart" class="w-7 h-7 {% if is_liked %}text-red-500 fill-current{% else %}text-gray-700 group-hover:text-red-500{% endif %} transition-colors duration-200"></i>
+                                    </div>
+                                </button>
+
+                                <!-- Comment Button -->
+                                <button class="group flex items-center space-x-2 transition-all duration-200">
+                                    <div class="w-10 h-10 rounded-full flex items-center justify-center group-hover:bg-blue-50 transition-colors duration-200">
+                                        <i data-lucide="message-circle" class="w-7 h-7 text-gray-700 group-hover:text-blue-500 transition-colors duration-200"></i>
+                                    </div>
+                                </button>
+
+                                <!-- Share Button -->
+                                <button class="group flex items-center space-x-2 transition-all duration-200">
+                                    <div class="w-10 h-10 rounded-full flex items-center justify-center group-hover:bg-green-50 transition-colors duration-200">
+                                        <i data-lucide="send" class="w-7 h-7 text-gray-700 group-hover:text-green-500 transition-colors duration-200"></i>
+                                    </div>
+                                </button>
+                            </div>
+
+                            <!-- Save Button -->
+                            <button class="group transition-all duration-200">
+                                <div class="w-10 h-10 rounded-full flex items-center justify-center group-hover:bg-yellow-50 transition-colors duration-200">
+                                    <i data-lucide="bookmark" class="w-7 h-7 text-gray-700 group-hover:text-yellow-500 transition-colors duration-200"></i>
+                                </div>
+                            </button>
+                        </div>
+
+                        <!-- Likes Count -->
+                        <div class="mb-4">
+                            <span id="likes-count-{{ post.pk }}" class="font-bold text-gray-900">{{ post.likes_count|floatformat:0 }}</span>
+                            <span class="text-gray-900 font-bold">{% if post.likes_count == 1 %}like{% else %}likes{% endif %}</span>
+                        </div>
+
+                        <!-- Post Caption -->
+                        {% if post.content %}
+                        <div class="mb-4">
+                            <p class="text-gray-900">
+                                <span class="font-bold">{{ post.author.username }}</span>
+                                {{ post.content|linebreaks }}
+                            </p>
+                        </div>
+                        {% endif %}
+
+                        <!-- View Comments -->
+                        {% if post.comments_count > 0 %}
+                        <div class="mb-4">
+                            <button class="text-gray-500 text-sm font-medium hover:text-gray-700">
+                                View all {{ post.comments_count }} comment{{ post.comments_count|pluralize }}
+                            </button>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Add Comment Form -->
+                {% if user.is_authenticated %}
+                <div class="bg-white border border-gray-200 rounded-2xl shadow-lg overflow-hidden mx-4 mb-8">
+                    <div class="p-6 border-b border-gray-100">
+                        <form method="post" action="{% url 'posts:add_comment' post.pk %}" class="flex items-start space-x-4">
+                            {% csrf_token %}
+                            <div class="w-12 h-12 rounded-full p-0.5 bg-gradient-to-tr from-pink-400 to-purple-400">
+                                <img src="{{ user.profile.profile_picture.url }}"
+                                     alt="{{ user.username }}"
+                                     class="w-full h-full rounded-full border border-white object-cover">
+                            </div>
+                            <div class="flex-1">
+                                <div class="relative">
+                                    {{ comment_form.content }}
+                                    <button type="submit" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-blue-500 hover:text-blue-600 font-bold text-sm">
+                                        Post
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Comments -->
+                <div class="space-y-6 mx-4">
+                    {% for comment in comments %}
+                    <div class="bg-white border border-gray-200 rounded-2xl shadow-lg overflow-hidden">
+                        <div class="p-6">
+                            <div class="flex items-start space-x-4">
+                                <div class="w-12 h-12 rounded-full p-0.5 bg-gradient-to-tr from-pink-400 to-purple-400">
+                                    <a href="{% url 'accounts:profile' comment.author.username %}">
+                                        <img src="{{ comment.author.profile.profile_picture.url }}"
+                                             alt="{{ comment.author.username }}"
+                                             class="w-full h-full rounded-full border border-white object-cover">
+                                    </a>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex items-center space-x-3 mb-2">
+                                        <a href="{% url 'accounts:profile' comment.author.username %}"
+                                           class="font-bold text-gray-900 hover:text-gray-700">
+                                            {{ comment.author.username }}
+                                        </a>
+                                        <span class="text-gray-500 text-sm">{{ comment.time_since_posted }}</span>
+
+                                        {% if comment.author == user %}
+                                        <form method="post" action="{% url 'posts:delete_comment' comment.pk %}" class="inline ml-auto">
+                                            {% csrf_token %}
+                                            <button type="submit" class="text-gray-400 hover:text-red-500 transition-colors">
+                                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                            </button>
+                                        </form>
+                                        {% endif %}
+                                    </div>
+                                    <p class="text-gray-900 leading-relaxed">{{ comment.content|linebreaks }}</p>
+
+                                    <!-- Comment Actions -->
+                                    <div class="flex items-center space-x-6 mt-4">
+                                        <button class="text-gray-500 hover:text-red-500 text-sm font-medium transition-colors">
+                                            <i data-lucide="heart" class="w-4 h-4 inline mr-1"></i>Like
+                                        </button>
+                                        {% if user.is_authenticated %}
+                                        <button onclick="toggleReplyForm({{ comment.pk }})" class="text-gray-500 hover:text-blue-500 text-sm font-medium transition-colors">
+                                            <i data-lucide="message-circle" class="w-4 h-4 inline mr-1"></i>Reply
+                                        </button>
+                                        {% endif %}
+                                    </div>
+
+                                    <!-- Reply Form -->
+                                    {% if user.is_authenticated %}
+                                    <div id="reply-form-{{ comment.pk }}" class="hidden mt-4 pt-4 border-t border-gray-100">
+                                        <form method="post" action="{% url 'posts:add_comment' post.pk %}" class="flex items-start space-x-3">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="parent_id" value="{{ comment.pk }}">
+                                            <div class="w-10 h-10 rounded-full p-0.5 bg-gradient-to-tr from-pink-400 to-purple-400">
+                                                <img src="{{ user.profile.profile_picture.url }}"
+                                                     alt="{{ user.username }}"
+                                                     class="w-full h-full rounded-full border border-white object-cover">
+                                            </div>
+                                            <div class="flex-1">
+                                                <div class="relative">
+                                                    <input type="text" name="content" placeholder="Write a reply..."
+                                                           class="w-full px-4 py-3 pr-16 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                                    <button type="submit" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-blue-500 hover:text-blue-600 font-bold text-sm">
+                                                        Post
+                                                    </button>
+                                                </div>
+                                                <button type="button" onclick="toggleReplyForm({{ comment.pk }})" class="text-gray-500 hover:text-gray-700 text-sm mt-2">
+                                                    Cancel
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    {% endif %}
+
+                                    <!-- Replies -->
+                                    {% if comment.replies.all %}
+                                    <div class="mt-6 pl-6 border-l-2 border-gray-100 space-y-4">
+                                        {% for reply in comment.replies.all %}
+                                        <div class="flex items-start space-x-3">
+                                            <div class="w-10 h-10 rounded-full p-0.5 bg-gradient-to-tr from-cyan-400 to-blue-400">
+                                                <a href="{% url 'accounts:profile' reply.author.username %}">
+                                                    <img src="{{ reply.author.profile.profile_picture.url }}"
+                                                         alt="{{ reply.author.username }}"
+                                                         class="w-full h-full rounded-full border border-white object-cover">
+                                                </a>
+                                            </div>
+                                            <div class="flex-1">
+                                                <div class="flex items-center space-x-3 mb-1">
+                                                    <a href="{% url 'accounts:profile' reply.author.username %}"
+                                                       class="font-bold text-gray-900 hover:text-gray-700 text-sm">
+                                                        {{ reply.author.username }}
+                                                    </a>
+                                                    <span class="text-gray-500 text-xs">{{ reply.time_since_posted }}</span>
+
+                                                    {% if reply.author == user %}
+                                                    <form method="post" action="{% url 'posts:delete_comment' reply.pk %}" class="inline ml-auto">
+                                                        {% csrf_token %}
+                                                        <button type="submit" class="text-gray-400 hover:text-red-500 transition-colors">
+                                                            <i data-lucide="trash-2" class="w-3 h-3"></i>
+                                                        </button>
+                                                    </form>
+                                                    {% endif %}
+                                                </div>
+                                                <p class="text-gray-900 text-sm leading-relaxed">{{ reply.content|linebreaks }}</p>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="bg-white border border-gray-200 rounded-2xl shadow-lg overflow-hidden mx-4">
+                        <div class="text-center py-12">
+                            <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                                <i data-lucide="message-circle" class="w-8 h-8 text-white"></i>
+                            </div>
+                            <p class="text-gray-500 font-medium">No comments yet. Be the first to comment!</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Lucide Icons -->
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Lucide icons
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+});
+
+function likePost(postId) {
+    fetch(`/posts/${postId}/like/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            'X-Requested-With': 'XMLHttpRequest',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        const likeButton = document.querySelector(`button[onclick="likePost(${postId})"] i`);
+        const likeCount = document.getElementById(`likes-count-${postId}`);
+
+        if (data.is_liked) {
+            // Liked state - red heart with fill
+            likeButton.setAttribute('style', 'color: #ef4444 !important; fill: #ef4444 !important;');
+            likeButton.classList.add('text-red-500');
+            likeButton.classList.remove('text-gray-700', 'group-hover:text-red-500');
+
+            // Add bounce animation
+            likeButton.classList.add('animate-bounce');
+            setTimeout(() => {
+                likeButton.classList.remove('animate-bounce');
+            }, 600);
+        } else {
+            // Unliked state - gray heart
+            likeButton.setAttribute('style', 'color: #374151 !important; fill: none !important;');
+            likeButton.classList.remove('text-red-500');
+            likeButton.classList.add('text-gray-700', 'group-hover:text-red-500');
+        }
+
+        // Update likes count
+        if (likeCount) {
+            likeCount.textContent = data.likes_count;
+        }
+
+        // Update the pluralization
+        const likesText = likeCount ? likeCount.nextElementSibling : null;
+        if (likesText) {
+            likesText.textContent = data.likes_count === 1 ? 'like' : 'likes';
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        // Show visual feedback even if request fails
+        const likeButton = document.querySelector(`button[onclick="likePost(${postId})"] i`);
+        if (likeButton) {
+            likeButton.setAttribute('style', 'color: #ef4444 !important; fill: #ef4444 !important;');
+            likeButton.classList.add('animate-bounce', 'text-red-500');
+            likeButton.classList.remove('text-gray-700');
+            setTimeout(() => {
+                likeButton.classList.remove('animate-bounce');
+            }, 600);
+        }
+    });
+}
+
+function toggleReplyForm(commentId) {
+    const form = document.getElementById(`reply-form-${commentId}`);
+    form.classList.toggle('hidden');
+
+    // Focus on the input field when showing the form
+    if (!form.classList.contains('hidden')) {
+        const input = form.querySelector('input[name="content"]');
+        if (input) {
+            setTimeout(() => input.focus(), 100);
+        }
+    }
+}
+</script>
+
+<style>
+/* Custom styles for the post detail page */
+.animate-bounce {
+    animation: bounce 0.6s ease-in-out;
+}
+
+@keyframes bounce {
+    0%, 20%, 53%, 80%, 100% {
+        transform: translate3d(0,0,0);
+    }
+    40%, 43% {
+        transform: translate3d(0,-15px,0);
+    }
+    70% {
+        transform: translate3d(0,-7px,0);
+    }
+    90% {
+        transform: translate3d(0,-2px,0);
+    }
+}
+
+/* Gradient backgrounds */
+.bg-gradient-to-r {
+    background: linear-gradient(to right, var(--tw-gradient-stops));
+}
+
+.bg-gradient-to-tr {
+    background: linear-gradient(to top right, var(--tw-gradient-stops));
+}
+
+.bg-gradient-to-br {
+    background: linear-gradient(to bottom right, var(--tw-gradient-stops));
+}
+
+.bg-clip-text {
+    -webkit-background-clip: text;
+    background-clip: text;
+}
+
+.text-transparent {
+    color: transparent;
+}
+
+/* Enhanced form styling */
+input[type="text"], textarea {
+    transition: all 0.2s ease-in-out;
+}
+
+input[type="text"]:focus, textarea:focus {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Heart icon styling */
+[data-lucide="heart"] {
+    transition: all 0.2s ease-in-out;
+}
+
+[data-lucide="heart"].text-red-500 {
+    color: #ef4444 !important;
+    fill: #ef4444 !important;
+}
+
+/* Like button animations */
+.like-animation {
+    animation: likeAnimation 0.6s ease-in-out;
+}
+
+@keyframes likeAnimation {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .lg\:ml-64 {
+        margin-left: 0;
+    }
+}
+</style>
+{% endblock %}

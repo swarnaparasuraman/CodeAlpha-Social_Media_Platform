@@ -1,0 +1,347 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ profile_user.username }} - Glintz{% endblock %}
+
+{% block content %}
+<div class="bg-gray-50 min-h-screen">
+    <!-- Instagram-style Layout -->
+    <div class="flex">
+        <!-- Left Sidebar Navigation -->
+        <div class="fixed left-0 top-0 h-full w-64 bg-white border-r border-gray-200 z-40 hidden lg:block">
+            <div class="p-6">
+                <!-- Logo -->
+                <div class="mb-8">
+                    <h1 class="text-2xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 bg-clip-text text-transparent">Glintz</h1>
+                </div>
+
+                <!-- Navigation Menu -->
+                <nav class="space-y-2">
+                    <a href="{% url 'posts:feed' %}" class="flex items-center space-x-3 px-3 py-3 rounded-lg hover:bg-gray-100 text-gray-600">
+                        <i data-lucide="home" class="w-6 h-6"></i>
+                        <span>Home</span>
+                    </a>
+                    <a href="{% url 'accounts:search_users' %}" class="flex items-center space-x-3 px-3 py-3 rounded-lg hover:bg-gray-100 text-gray-600">
+                        <i data-lucide="search" class="w-6 h-6"></i>
+                        <span>Search</span>
+                    </a>
+                    <a href="{% url 'posts:explore' %}" class="flex items-center space-x-3 px-3 py-3 rounded-lg hover:bg-gray-100 text-gray-600">
+                        <i data-lucide="compass" class="w-6 h-6"></i>
+                        <span>Explore</span>
+                    </a>
+                    <a href="#" class="flex items-center space-x-3 px-3 py-3 rounded-lg hover:bg-gray-100 text-gray-600">
+                        <i data-lucide="video" class="w-6 h-6"></i>
+                        <span>Reels</span>
+                    </a>
+                    <a href="#" class="flex items-center space-x-3 px-3 py-3 rounded-lg hover:bg-gray-100 text-gray-600">
+                        <i data-lucide="send" class="w-6 h-6"></i>
+                        <span>Messages</span>
+                    </a>
+                    <a href="{% url 'social:notifications' %}" class="flex items-center space-x-3 px-3 py-3 rounded-lg hover:bg-gray-100 text-gray-600">
+                        <i data-lucide="heart" class="w-6 h-6"></i>
+                        <span>Notifications</span>
+                    </a>
+                    <a href="{% url 'posts:create' %}" class="flex items-center space-x-3 px-3 py-3 rounded-lg hover:bg-gray-100 text-gray-600">
+                        <i data-lucide="plus-square" class="w-6 h-6"></i>
+                        <span>Create</span>
+                    </a>
+                    <a href="{% url 'accounts:profile' user.username %}" class="flex items-center space-x-3 px-3 py-3 rounded-lg hover:bg-gray-100 text-gray-900 font-medium">
+                        <img src="{{ user.profile.profile_picture.url }}" alt="Profile" class="w-6 h-6 rounded-full object-cover">
+                        <span>Profile</span>
+                    </a>
+                </nav>
+
+                <!-- More Menu -->
+                <div class="absolute bottom-6 left-6 right-6">
+                    <a href="#" class="flex items-center space-x-3 px-3 py-3 rounded-lg hover:bg-gray-100 text-gray-600">
+                        <i data-lucide="menu" class="w-6 h-6"></i>
+                        <span>More</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Header -->
+        <div class="lg:hidden bg-white border-b border-gray-200 px-4 py-3 fixed top-0 left-0 right-0 z-50">
+            <div class="flex items-center justify-between">
+                <a href="{% url 'posts:feed' %}" class="text-gray-600">
+                    <i data-lucide="arrow-left" class="w-6 h-6"></i>
+                </a>
+                <h1 class="text-lg font-semibold">{{ profile_user.username }}</h1>
+                <div class="flex items-center space-x-4">
+                    {% if is_own_profile %}
+                    <a href="{% url 'accounts:edit_profile' %}" class="text-gray-600">
+                        <i data-lucide="settings" class="w-6 h-6"></i>
+                    </a>
+                    {% endif %}
+                    <button class="text-gray-600">
+                        <i data-lucide="more-vertical" class="w-6 h-6"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 lg:ml-64 pt-16 lg:pt-0">
+            <div class="max-w-4xl mx-auto px-4 py-8">
+                <!-- Profile Header -->
+                <div class="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+                    <div class="flex flex-col md:flex-row items-center md:items-start space-y-6 md:space-y-0 md:space-x-8">
+                        <!-- Profile Picture -->
+                        <div class="relative">
+                            <div class="w-32 h-32 md:w-40 md:h-40 rounded-full p-1 bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-500">
+                                <div class="w-full h-full rounded-full border-4 border-white overflow-hidden">
+                                    <img src="{{ profile.profile_picture.url }}"
+                                         alt="{{ profile_user.username }}"
+                                         class="w-full h-full object-cover">
+                                </div>
+                            </div>
+                            {% if profile.verified %}
+                            <div class="absolute -bottom-1 -right-1 w-8 h-8 bg-blue-500 rounded-full border-4 border-white flex items-center justify-center">
+                                <i data-lucide="check" class="w-4 h-4 text-white"></i>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Profile Info -->
+                        <div class="flex-1 text-center md:text-left">
+                            <!-- Username and Actions -->
+                            <div class="flex flex-col md:flex-row md:items-center md:space-x-6 mb-6">
+                                <h1 class="text-2xl font-light text-gray-900 mb-4 md:mb-0">{{ profile_user.username }}</h1>
+
+                                <div class="flex space-x-2">
+                                    {% if is_own_profile %}
+                                        <a href="{% url 'accounts:edit_profile' %}" class="px-4 py-1.5 bg-gray-100 text-gray-900 text-sm font-medium rounded-md hover:bg-gray-200 transition-colors">
+                                            Edit profile
+                                        </a>
+                                        <button class="px-4 py-1.5 bg-gray-100 text-gray-900 text-sm font-medium rounded-md hover:bg-gray-200 transition-colors">
+                                            View archive
+                                        </button>
+                                        <button class="p-1.5 bg-gray-100 text-gray-900 rounded-md hover:bg-gray-200 transition-colors">
+                                            <i data-lucide="settings" class="w-4 h-4"></i>
+                                        </button>
+                                    {% elif user.is_authenticated %}
+                                        {% if is_following %}
+                                            <a href="{% url 'accounts:unfollow' profile_user.username %}" class="px-6 py-1.5 bg-gray-200 text-gray-900 text-sm font-medium rounded-md hover:bg-gray-300 transition-colors">
+                                                Following
+                                            </a>
+                                        {% else %}
+                                            <a href="{% url 'accounts:follow' profile_user.username %}" class="px-6 py-1.5 bg-blue-500 text-white text-sm font-medium rounded-md hover:bg-blue-600 transition-colors">
+                                                Follow
+                                            </a>
+                                        {% endif %}
+                                        <a href="{% url 'social:messages' %}" class="px-4 py-1.5 bg-gray-100 text-gray-900 text-sm font-medium rounded-md hover:bg-gray-200 transition-colors">
+                                            Message
+                                        </a>
+                                        <button class="p-1.5 bg-gray-100 text-gray-900 rounded-md hover:bg-gray-200 transition-colors">
+                                            <i data-lucide="user-plus" class="w-4 h-4"></i>
+                                        </button>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Stats -->
+                            <div class="flex justify-center md:justify-start space-x-8 mb-4">
+                                <div class="text-center">
+                                    <div class="text-lg font-semibold text-gray-900">{{ profile.posts_count }}</div>
+                                    <div class="text-gray-600 text-sm">posts</div>
+                                </div>
+                                <a href="{% url 'accounts:followers' profile_user.username %}" class="text-center hover:text-gray-600">
+                                    <div class="text-lg font-semibold text-gray-900">{{ profile.followers_count }}</div>
+                                    <div class="text-gray-600 text-sm">followers</div>
+                                </a>
+                                <a href="{% url 'accounts:following' profile_user.username %}" class="text-center hover:text-gray-600">
+                                    <div class="text-lg font-semibold text-gray-900">{{ profile.following_count }}</div>
+                                    <div class="text-gray-600 text-sm">following</div>
+                                </a>
+                            </div>
+
+                            <!-- Bio -->
+                            <div class="text-sm">
+                                {% if profile.full_name %}
+                                    <div class="font-semibold text-gray-900 mb-1">{{ profile.full_name }}</div>
+                                {% endif %}
+                                {% if profile.bio %}
+                                    <div class="text-gray-900 mb-2 whitespace-pre-line">{{ profile.bio }}</div>
+                                {% endif %}
+                                {% if profile.website %}
+                                    <a href="{{ profile.website }}" target="_blank" class="text-blue-900 hover:underline">
+                                        {{ profile.website }}
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Post Navigation Tabs -->
+                <div class="bg-white border-t border-gray-200">
+                    <div class="flex justify-center">
+                        <button class="flex items-center space-x-1 px-6 py-3 border-t border-gray-900 text-gray-900 text-xs font-medium uppercase tracking-wide">
+                            <i data-lucide="grid-3x3" class="w-3 h-3"></i>
+                            <span>Posts</span>
+                        </button>
+                        <button class="flex items-center space-x-1 px-6 py-3 text-gray-400 text-xs font-medium uppercase tracking-wide hover:text-gray-600">
+                            <i data-lucide="bookmark" class="w-3 h-3"></i>
+                            <span>Saved</span>
+                        </button>
+                        <button class="flex items-center space-x-1 px-6 py-3 text-gray-400 text-xs font-medium uppercase tracking-wide hover:text-gray-600">
+                            <i data-lucide="user-check" class="w-3 h-3"></i>
+                            <span>Tagged</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Posts Grid -->
+                <div class="bg-white">
+                    {% if page_obj %}
+                    <div class="grid grid-cols-3 gap-1">
+                        {% for post in page_obj %}
+                        <div class="relative aspect-square group cursor-pointer">
+                            {% if post.image %}
+                                <img src="{{ post.image.url }}"
+                                     alt="Post image"
+                                     class="w-full h-full object-cover">
+
+                                <!-- Hover overlay -->
+                                <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
+                                    <div class="flex items-center space-x-6 text-white">
+                                        <div class="flex items-center space-x-1">
+                                            <i data-lucide="heart" class="w-5 h-5 fill-current"></i>
+                                            <span class="font-semibold">{{ post.likes_count }}</span>
+                                        </div>
+                                        <div class="flex items-center space-x-1">
+                                            <i data-lucide="message-circle" class="w-5 h-5 fill-current"></i>
+                                            <span class="font-semibold">{{ post.comments_count }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Multiple photos indicator -->
+                                {% if post.has_multiple_images %}
+                                <div class="absolute top-2 right-2">
+                                    <i data-lucide="copy" class="w-4 h-4 text-white drop-shadow"></i>
+                                </div>
+                                {% endif %}
+
+                                <!-- Video indicator -->
+                                {% if post.is_video %}
+                                <div class="absolute top-2 right-2">
+                                    <i data-lucide="play" class="w-4 h-4 text-white drop-shadow"></i>
+                                </div>
+                                {% endif %}
+                            {% else %}
+                                <!-- Text-only post -->
+                                <div class="w-full h-full bg-gradient-to-br from-purple-400 via-pink-500 to-red-500 flex items-center justify-center p-4">
+                                    <p class="text-white text-center text-sm font-medium line-clamp-4">{{ post.content|truncatewords:15 }}</p>
+                                </div>
+
+                                <!-- Hover overlay for text posts -->
+                                <div class="absolute inset-0 bg-black bg-opacity-30 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
+                                    <div class="flex items-center space-x-6 text-white">
+                                        <div class="flex items-center space-x-1">
+                                            <i data-lucide="heart" class="w-5 h-5 fill-current"></i>
+                                            <span class="font-semibold">{{ post.likes_count }}</span>
+                                        </div>
+                                        <div class="flex items-center space-x-1">
+                                            <i data-lucide="message-circle" class="w-5 h-5 fill-current"></i>
+                                            <span class="font-semibold">{{ post.comments_count }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+
+                            <a href="{% url 'posts:detail' post.pk %}" class="absolute inset-0"></a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <!-- Empty state -->
+                    <div class="text-center py-16">
+                        <div class="w-16 h-16 mx-auto mb-4 border-2 border-gray-900 rounded-full flex items-center justify-center">
+                            <i data-lucide="camera" class="w-8 h-8 text-gray-900"></i>
+                        </div>
+                        <h3 class="text-2xl font-light text-gray-900 mb-2">Share Photos</h3>
+                        {% if is_own_profile %}
+                            <p class="text-gray-600 mb-4">When you share photos, they will appear on your profile.</p>
+                            <a href="{% url 'posts:create' %}" class="text-blue-500 font-semibold hover:text-blue-600">
+                                Share your first photo
+                            </a>
+                        {% else %}
+                            <p class="text-gray-600">When {{ profile_user.username }} shares photos, you'll see them here.</p>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Pagination -->
+                {% if page_obj.has_other_pages %}
+                <div class="bg-white border-t border-gray-200 py-4">
+                    <div class="flex justify-center">
+                        <nav class="flex items-center space-x-2">
+                            {% if page_obj.has_previous %}
+                                <a href="?page={{ page_obj.previous_page_number }}"
+                                   class="px-3 py-2 text-sm text-gray-500 hover:text-gray-700">
+                                    <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                                </a>
+                            {% endif %}
+
+                            <span class="px-3 py-2 text-sm text-gray-700">
+                                {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+                            </span>
+
+                            {% if page_obj.has_next %}
+                                <a href="?page={{ page_obj.next_page_number }}"
+                                   class="px-3 py-2 text-sm text-gray-500 hover:text-gray-700">
+                                    <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                                </a>
+                            {% endif %}
+                        </nav>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Lucide Icons Script -->
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script>
+    lucide.createIcons();
+</script>
+
+<style>
+.line-clamp-4 {
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+    .lg\:ml-64 {
+        margin-left: 0;
+    }
+}
+
+/* Smooth transitions */
+.transition-all {
+    transition: all 0.2s ease-in-out;
+}
+
+/* Gradient text */
+.bg-gradient-to-r {
+    background: linear-gradient(to right, var(--tw-gradient-stops));
+}
+
+.bg-clip-text {
+    -webkit-background-clip: text;
+    background-clip: text;
+}
+
+.text-transparent {
+    color: transparent;
+}
+</style>
+{% endblock %}

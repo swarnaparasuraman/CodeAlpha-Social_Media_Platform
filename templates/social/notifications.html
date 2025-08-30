@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+
+{% block title %}Notifications - Social Platform{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <h1 class="text-3xl font-bold text-gray-900 mb-8">Notifications</h1>
+    
+    {% if page_obj %}
+    <div class="space-y-4">
+        {% for notification in page_obj %}
+        <div class="card p-4 {% if not notification.is_read %}bg-blue-50 border-blue-200{% endif %}">
+            <div class="flex items-start space-x-3">
+                <a href="{% url 'accounts:profile' notification.sender.username %}">
+                    <img src="{{ notification.sender.profile.profile_picture.url }}" 
+                         alt="{{ notification.sender.username }}" 
+                         class="w-10 h-10 rounded-full object-cover">
+                </a>
+                
+                <div class="flex-1">
+                    <div class="flex items-center space-x-2">
+                        {% if not notification.is_read %}
+                        <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+                        {% endif %}
+                        
+                        <p class="text-gray-900">
+                            <a href="{% url 'accounts:profile' notification.sender.username %}" 
+                               class="font-semibold hover:text-blue-600">
+                                {{ notification.sender.profile.full_name }}
+                            </a>
+                            
+                            {% if notification.notification_type == 'like' %}
+                                <i class="fas fa-heart text-red-500 mx-1"></i>
+                                liked your 
+                                {% if notification.post %}
+                                    <a href="{% url 'posts:detail' notification.post.pk %}" class="text-blue-600 hover:text-blue-500">post</a>
+                                {% elif notification.comment %}
+                                    <a href="{% url 'posts:detail' notification.comment.post.pk %}" class="text-blue-600 hover:text-blue-500">comment</a>
+                                {% endif %}
+                            
+                            {% elif notification.notification_type == 'comment' %}
+                                <i class="fas fa-comment text-blue-500 mx-1"></i>
+                                commented on your 
+                                <a href="{% url 'posts:detail' notification.post.pk %}" class="text-blue-600 hover:text-blue-500">post</a>
+                            
+                            {% elif notification.notification_type == 'follow' %}
+                                <i class="fas fa-user-plus text-green-500 mx-1"></i>
+                                started following you
+                            
+                            {% elif notification.notification_type == 'mention' %}
+                                <i class="fas fa-at text-purple-500 mx-1"></i>
+                                mentioned you in a 
+                                {% if notification.post %}
+                                    <a href="{% url 'posts:detail' notification.post.pk %}" class="text-blue-600 hover:text-blue-500">post</a>
+                                {% elif notification.comment %}
+                                    <a href="{% url 'posts:detail' notification.comment.post.pk %}" class="text-blue-600 hover:text-blue-500">comment</a>
+                                {% endif %}
+                            {% endif %}
+                        </p>
+                    </div>
+                    
+                    <p class="text-sm text-gray-500 mt-1">{{ notification.created_at|timesince }} ago</p>
+                    
+                    <!-- Show post/comment content preview -->
+                    {% if notification.post and notification.notification_type != 'follow' %}
+                    <div class="mt-2 p-3 bg-gray-50 rounded-md">
+                        <p class="text-sm text-gray-700">{{ notification.post.content|truncatewords:15 }}</p>
+                        {% if notification.post.image %}
+                        <div class="mt-2">
+                            <img src="{{ notification.post.image.url }}" 
+                                 alt="Post image" 
+                                 class="w-16 h-16 object-cover rounded">
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% elif notification.comment %}
+                    <div class="mt-2 p-3 bg-gray-50 rounded-md">
+                        <p class="text-sm text-gray-700">{{ notification.comment.content|truncatewords:15 }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="text-xs text-gray-400">
+                    {{ notification.created_at|date:"M d" }}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <div class="flex justify-center mt-8">
+        <nav class="flex items-center space-x-2">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}" 
+                   class="px-3 py-2 text-sm text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+            {% endif %}
+            
+            <span class="px-3 py-2 text-sm text-gray-700">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+            </span>
+            
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}" 
+                   class="px-3 py-2 text-sm text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+            {% endif %}
+        </nav>
+    </div>
+    {% endif %}
+    
+    {% else %}
+    <div class="text-center py-12">
+        <i class="fas fa-bell text-6xl text-gray-300 mb-4"></i>
+        <h3 class="text-xl font-semibold text-gray-600 mb-2">No notifications yet</h3>
+        <p class="text-gray-500 mb-4">When someone likes, comments, or follows you, you'll see it here.</p>
+        <a href="{% url 'posts:explore' %}" class="btn-primary">
+            Explore Posts
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

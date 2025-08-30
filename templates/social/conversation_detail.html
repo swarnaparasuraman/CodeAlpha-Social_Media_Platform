@@ -1,0 +1,244 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ other_participant.username }} - Messages - Glintz{% endblock %}
+
+{% block content %}
+<div class="bg-gray-50 min-h-screen">
+    <!-- Instagram-style Layout -->
+    <div class="flex">
+        <!-- Left Sidebar Navigation -->
+        <div class="fixed left-0 top-0 h-full w-64 bg-white border-r border-gray-200 z-40 hidden lg:block">
+            <div class="p-6">
+                <!-- Logo -->
+                <div class="mb-8">
+                    <h1 class="text-2xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 bg-clip-text text-transparent">Glintz</h1>
+                </div>
+                
+                <!-- Navigation Menu -->
+                <nav class="space-y-2">
+                    <a href="{% url 'posts:feed' %}" class="flex items-center space-x-3 px-3 py-3 rounded-lg hover:bg-gray-100 text-gray-600">
+                        <i data-lucide="home" class="w-6 h-6"></i>
+                        <span>Home</span>
+                    </a>
+                    <a href="{% url 'accounts:search_users' %}" class="flex items-center space-x-3 px-3 py-3 rounded-lg hover:bg-gray-100 text-gray-600">
+                        <i data-lucide="search" class="w-6 h-6"></i>
+                        <span>Search</span>
+                    </a>
+                    <a href="{% url 'posts:explore' %}" class="flex items-center space-x-3 px-3 py-3 rounded-lg hover:bg-gray-100 text-gray-600">
+                        <i data-lucide="compass" class="w-6 h-6"></i>
+                        <span>Explore</span>
+                    </a>
+                    <a href="{% url 'posts:reels' %}" class="flex items-center space-x-3 px-3 py-3 rounded-lg hover:bg-gray-100 text-gray-600">
+                        <i data-lucide="video" class="w-6 h-6"></i>
+                        <span>Reels</span>
+                    </a>
+                    <a href="{% url 'social:messages' %}" class="flex items-center space-x-3 px-3 py-3 rounded-lg bg-gray-100 text-gray-900 font-medium">
+                        <i data-lucide="send" class="w-6 h-6"></i>
+                        <span>Messages</span>
+                    </a>
+                    <a href="{% url 'social:notifications' %}" class="flex items-center space-x-3 px-3 py-3 rounded-lg hover:bg-gray-100 text-gray-600">
+                        <i data-lucide="heart" class="w-6 h-6"></i>
+                        <span>Notifications</span>
+                    </a>
+                    <a href="{% url 'posts:create' %}" class="flex items-center space-x-3 px-3 py-3 rounded-lg hover:bg-gray-100 text-gray-600">
+                        <i data-lucide="plus-square" class="w-6 h-6"></i>
+                        <span>Create</span>
+                    </a>
+                    <a href="{% url 'accounts:profile' user.username %}" class="flex items-center space-x-3 px-3 py-3 rounded-lg hover:bg-gray-100 text-gray-600">
+                        <img src="{{ user.profile.profile_picture.url }}" alt="Profile" class="w-6 h-6 rounded-full object-cover">
+                        <span>Profile</span>
+                    </a>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Mobile Header -->
+        <div class="lg:hidden bg-white border-b border-gray-200 px-4 py-3 fixed top-0 left-0 right-0 z-50">
+            <div class="flex items-center justify-between">
+                <a href="{% url 'social:messages' %}" class="text-gray-600">
+                    <i data-lucide="arrow-left" class="w-6 h-6"></i>
+                </a>
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 rounded-full p-0.5 bg-gradient-to-tr from-pink-400 to-purple-400">
+                        <img src="{{ other_participant.profile.profile_picture.url }}" 
+                             alt="{{ other_participant.username }}" 
+                             class="w-full h-full rounded-full border border-white object-cover">
+                    </div>
+                    <span class="font-semibold">{{ other_participant.username }}</span>
+                </div>
+                <button class="text-gray-600">
+                    <i data-lucide="phone" class="w-6 h-6"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 lg:ml-64 pt-16 lg:pt-0">
+            <div class="h-screen flex flex-col">
+                <!-- Chat Header -->
+                <div class="hidden lg:block bg-white border-b border-gray-200 p-6">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-4">
+                            <a href="{% url 'social:messages' %}" class="text-gray-600 hover:text-gray-900">
+                                <i data-lucide="arrow-left" class="w-6 h-6"></i>
+                            </a>
+                            <div class="w-12 h-12 rounded-full p-0.5 bg-gradient-to-tr from-pink-500 via-purple-500 to-cyan-500">
+                                <img src="{{ other_participant.profile.profile_picture.url }}" 
+                                     alt="{{ other_participant.username }}" 
+                                     class="w-full h-full rounded-full border-2 border-white object-cover">
+                            </div>
+                            <div>
+                                <h2 class="font-bold text-gray-900">{{ other_participant.username }}</h2>
+                                <p class="text-sm text-green-500">Active now</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <button class="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors">
+                                <i data-lucide="phone" class="w-5 h-5"></i>
+                            </button>
+                            <button class="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors">
+                                <i data-lucide="video" class="w-5 h-5"></i>
+                            </button>
+                            <button class="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors">
+                                <i data-lucide="info" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Messages Container -->
+                <div id="messages-container" class="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50">
+                    {% for message in messages %}
+                    <div class="flex {% if message.sender.username == user.username %}justify-end{% else %}justify-start{% endif %}">
+                        {% if message.sender.username != user.username %}
+                        <!-- Other person's message -->
+                        <div class="flex items-end space-x-2 max-w-xs lg:max-w-md">
+                            <div class="w-8 h-8 rounded-full p-0.5 bg-gradient-to-tr from-pink-400 to-purple-400">
+                                <img src="{{ message.sender.profile.profile_picture.url }}" 
+                                     alt="{{ message.sender.username }}" 
+                                     class="w-full h-full rounded-full border border-white object-cover">
+                            </div>
+                            <div class="bg-white rounded-2xl rounded-bl-md px-4 py-3 shadow-sm">
+                                <p class="text-gray-900">{{ message.content }}</p>
+                                <p class="text-xs text-gray-500 mt-1">{{ message.time_since_sent }}</p>
+                            </div>
+                        </div>
+                        {% else %}
+                        <!-- Your message -->
+                        <div class="flex items-end space-x-2 max-w-xs lg:max-w-md">
+                            <div class="bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl rounded-br-md px-4 py-3 shadow-sm">
+                                <p class="text-white">{{ message.content }}</p>
+                                <p class="text-xs text-purple-100 mt-1">{{ message.time_since_sent }}</p>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% empty %}
+                    <!-- Empty state -->
+                    <div class="text-center py-16">
+                        <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                            <i data-lucide="message-circle" class="w-8 h-8 text-white"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">Start the conversation</h3>
+                        <p class="text-gray-600">Send a message to {{ other_participant.username }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Message Input -->
+                <div class="bg-white border-t border-gray-200 p-4">
+                    <div class="flex items-center space-x-4">
+                        <div class="flex-1 relative">
+                            <input type="text" 
+                                   placeholder="Message {{ other_participant.username }}..." 
+                                   class="w-full px-4 py-3 pr-12 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                   autocomplete="off">
+                            <button type="button" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                                <i data-lucide="smile" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                        <button type="button" 
+                                class="p-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full hover:from-purple-700 hover:to-pink-700 transition-all duration-200 shadow-lg hover:shadow-xl">
+                            <i data-lucide="send" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Lucide Icons -->
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Lucide icons
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+
+    const messagesContainer = document.getElementById('messages-container');
+
+    // Scroll to bottom of messages
+    function scrollToBottom() {
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    // Initial scroll to bottom
+    scrollToBottom();
+});
+</script>
+
+<style>
+/* Custom scrollbar */
+#messages-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+#messages-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+#messages-container::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
+
+#messages-container::-webkit-scrollbar-thumb:hover {
+    background: #a1a1a1;
+}
+
+/* Gradient backgrounds */
+.bg-gradient-to-r {
+    background: linear-gradient(to right, var(--tw-gradient-stops));
+}
+
+.bg-gradient-to-tr {
+    background: linear-gradient(to top right, var(--tw-gradient-stops));
+}
+
+.bg-gradient-to-br {
+    background: linear-gradient(to bottom right, var(--tw-gradient-stops));
+}
+
+.bg-clip-text {
+    -webkit-background-clip: text;
+    background-clip: text;
+}
+
+.text-transparent {
+    color: transparent;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .lg\:ml-64 {
+        margin-left: 0;
+    }
+}
+</style>
+{% endblock %}

@@ -1,0 +1,205 @@
+{% extends 'base.html' %}
+
+{% block title %}Messages - Glintz{% endblock %}
+
+{% block content %}
+<div class="bg-gray-50 min-h-screen">
+    <!-- Instagram-style Layout -->
+    <div class="flex">
+        <!-- Left Sidebar Navigation -->
+        <div class="fixed left-0 top-0 h-full w-64 bg-white border-r border-gray-200 z-40 hidden lg:block">
+            <div class="p-6">
+                <!-- Logo -->
+                <div class="mb-8">
+                    <h1 class="text-2xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 bg-clip-text text-transparent">Glintz</h1>
+                </div>
+                
+                <!-- Navigation Menu -->
+                <nav class="space-y-2">
+                    <a href="{% url 'posts:feed' %}" class="flex items-center space-x-3 px-3 py-3 rounded-lg hover:bg-gray-100 text-gray-600">
+                        <i data-lucide="home" class="w-6 h-6"></i>
+                        <span>Home</span>
+                    </a>
+                    <a href="{% url 'accounts:search_users' %}" class="flex items-center space-x-3 px-3 py-3 rounded-lg hover:bg-gray-100 text-gray-600">
+                        <i data-lucide="search" class="w-6 h-6"></i>
+                        <span>Search</span>
+                    </a>
+                    <a href="{% url 'posts:explore' %}" class="flex items-center space-x-3 px-3 py-3 rounded-lg hover:bg-gray-100 text-gray-600">
+                        <i data-lucide="compass" class="w-6 h-6"></i>
+                        <span>Explore</span>
+                    </a>
+                    <a href="{% url 'posts:reels' %}" class="flex items-center space-x-3 px-3 py-3 rounded-lg hover:bg-gray-100 text-gray-600">
+                        <i data-lucide="video" class="w-6 h-6"></i>
+                        <span>Reels</span>
+                    </a>
+                    <a href="{% url 'messaging:list' %}" class="flex items-center space-x-3 px-3 py-3 rounded-lg bg-gray-100 text-gray-900 font-medium">
+                        <i data-lucide="send" class="w-6 h-6"></i>
+                        <span>Messages</span>
+                    </a>
+                    <a href="{% url 'posts:create' %}" class="flex items-center space-x-3 px-3 py-3 rounded-lg hover:bg-gray-100 text-gray-600">
+                        <i data-lucide="plus-square" class="w-6 h-6"></i>
+                        <span>Create</span>
+                    </a>
+                    <a href="{% url 'accounts:profile' user.username %}" class="flex items-center space-x-3 px-3 py-3 rounded-lg hover:bg-gray-100 text-gray-600">
+                        <img src="{{ user.profile.profile_picture.url }}" alt="Profile" class="w-6 h-6 rounded-full object-cover">
+                        <span>Profile</span>
+                    </a>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Mobile Header -->
+        <div class="lg:hidden bg-white border-b border-gray-200 px-4 py-3 fixed top-0 left-0 right-0 z-50">
+            <div class="flex items-center justify-between">
+                <a href="{% url 'posts:feed' %}" class="text-gray-600">
+                    <i data-lucide="arrow-left" class="w-6 h-6"></i>
+                </a>
+                <h1 class="text-lg font-semibold">Messages</h1>
+                <button class="text-gray-600">
+                    <i data-lucide="edit" class="w-6 h-6"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 lg:ml-64 pt-16 lg:pt-0">
+            <div class="max-w-4xl mx-auto">
+                <!-- Messages Container -->
+                <div class="bg-white border border-gray-200 rounded-2xl shadow-lg overflow-hidden mx-4 my-8">
+                    <!-- Header -->
+                    <div class="p-6 border-b border-gray-100">
+                        <div class="flex items-center justify-between">
+                            <h2 class="text-2xl font-bold text-gray-900">Messages</h2>
+                            <button class="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors">
+                                <i data-lucide="edit" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Conversations List -->
+                    <div class="divide-y divide-gray-100">
+                        {% for conversation in conversations %}
+                        <a href="{% url 'messaging:conversation_detail' conversation.id %}" 
+                           class="block p-6 hover:bg-gray-50 transition-colors duration-200">
+                            <div class="flex items-center space-x-4">
+                                <!-- Profile Picture -->
+                                <div class="relative">
+                                    <div class="w-16 h-16 rounded-full p-0.5 bg-gradient-to-tr from-pink-500 via-purple-500 to-cyan-500">
+                                        <img src="{{ conversation.other_participant.profile.profile_picture.url }}" 
+                                             alt="{{ conversation.other_participant.username }}" 
+                                             class="w-full h-full rounded-full border-2 border-white object-cover">
+                                    </div>
+                                    {% if conversation.other_participant.profile.verified %}
+                                    <div class="absolute -bottom-1 -right-1 w-6 h-6 bg-blue-500 rounded-full border-2 border-white flex items-center justify-center">
+                                        <i data-lucide="check" class="w-3 h-3 text-white"></i>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    <!-- Online Status -->
+                                    <div class="absolute bottom-0 right-0 w-5 h-5 bg-green-500 rounded-full border-2 border-white"></div>
+                                </div>
+
+                                <!-- Conversation Info -->
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center justify-between mb-1">
+                                        <h3 class="font-bold text-gray-900 truncate">{{ conversation.other_participant.username }}</h3>
+                                        {% if conversation.last_message %}
+                                        <span class="text-sm text-gray-500">{{ conversation.last_message.time_since_sent }}</span>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    {% if conversation.last_message %}
+                                    <p class="text-gray-600 text-sm truncate">
+                                        {% if conversation.last_message.sender == user %}
+                                            You: {{ conversation.last_message.content }}
+                                        {% else %}
+                                            {{ conversation.last_message.content }}
+                                        {% endif %}
+                                    </p>
+                                    {% else %}
+                                    <p class="text-gray-500 text-sm italic">Start a conversation</p>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Unread Badge -->
+                                {% if conversation.unread_count > 0 %}
+                                <div class="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center">
+                                    <span class="text-white text-xs font-bold">{{ conversation.unread_count }}</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </a>
+                        {% empty %}
+                        <!-- Empty State -->
+                        <div class="text-center py-16">
+                            <div class="w-24 h-24 bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                                <i data-lucide="message-circle" class="w-12 h-12 text-white"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold text-gray-800 mb-4">No messages yet</h3>
+                            <p class="text-gray-600 mb-8 max-w-md mx-auto">
+                                Start a conversation with someone to see your messages here.
+                            </p>
+                            <a href="{% url 'accounts:search_users' %}" 
+                               class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 text-white font-bold rounded-xl hover:from-purple-700 hover:via-pink-700 hover:to-orange-600 transition-all duration-200 shadow-lg hover:shadow-xl">
+                                <i data-lucide="search" class="w-5 h-5 mr-2"></i>
+                                Find People
+                            </a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Lucide Icons -->
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Lucide icons
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+});
+</script>
+
+<style>
+/* Gradient backgrounds */
+.bg-gradient-to-r {
+    background: linear-gradient(to right, var(--tw-gradient-stops));
+}
+
+.bg-gradient-to-tr {
+    background: linear-gradient(to top right, var(--tw-gradient-stops));
+}
+
+.bg-gradient-to-br {
+    background: linear-gradient(to bottom right, var(--tw-gradient-stops));
+}
+
+.bg-clip-text {
+    -webkit-background-clip: text;
+    background-clip: text;
+}
+
+.text-transparent {
+    color: transparent;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .lg\:ml-64 {
+        margin-left: 0;
+    }
+}
+
+/* Smooth transitions */
+.transition-all {
+    transition: all 0.3s ease-in-out;
+}
+</style>
+{% endblock %}

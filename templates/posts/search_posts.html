@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block title %}Search Posts - Social Platform{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <!-- Search Header -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-4">Search Posts</h1>
+        
+        <!-- Search Form -->
+        <form method="GET" class="max-w-md">
+            <div class="relative">
+                <input type="text" name="q" value="{{ query }}" placeholder="Search posts..." 
+                       class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                <i class="fas fa-search absolute left-3 top-4 text-gray-400"></i>
+                <button type="submit" class="absolute right-2 top-2 btn-primary text-sm">
+                    Search
+                </button>
+            </div>
+        </form>
+        
+        {% if query %}
+        <p class="text-gray-600 mt-4">
+            {% if posts %}
+                Showing results for "<strong>{{ query }}</strong>"
+            {% else %}
+                No results found for "<strong>{{ query }}</strong>"
+            {% endif %}
+        </p>
+        {% endif %}
+    </div>
+    
+    <!-- Search Results -->
+    {% if posts %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for post in posts %}
+        <div class="card overflow-hidden hover:shadow-lg transition-shadow duration-200">
+            {% if post.image %}
+                <div class="aspect-square">
+                    <img src="{{ post.image.url }}" 
+                         alt="Post image" 
+                         class="w-full h-full object-cover">
+                </div>
+            {% endif %}
+            
+            <div class="p-4">
+                <!-- Author Info -->
+                <div class="flex items-center space-x-3 mb-3">
+                    <a href="{% url 'accounts:profile' post.author.username %}">
+                        <img src="{{ post.author.profile.profile_picture.url }}" 
+                             alt="{{ post.author.username }}" 
+                             class="w-8 h-8 rounded-full object-cover">
+                    </a>
+                    <div>
+                        <a href="{% url 'accounts:profile' post.author.username %}" 
+                           class="font-semibold text-gray-900 hover:text-blue-600 text-sm">
+                            {{ post.author.profile.full_name }}
+                        </a>
+                        <p class="text-xs text-gray-500">@{{ post.author.username }}</p>
+                    </div>
+                </div>
+                
+                <!-- Post Content -->
+                <p class="text-gray-900 text-sm line-clamp-3 mb-3">{{ post.content|truncatewords:25 }}</p>
+                
+                <!-- Post Stats -->
+                <div class="flex items-center justify-between text-xs text-gray-500">
+                    <span>{{ post.time_since_posted }}</span>
+                    <div class="flex items-center space-x-3">
+                        <span><i class="far fa-heart mr-1"></i>{{ post.likes_count }}</span>
+                        <span><i class="far fa-comment mr-1"></i>{{ post.comments_count }}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <a href="{% url 'posts:detail' post.pk %}" class="absolute inset-0"></a>
+        </div>
+        {% endfor %}
+    </div>
+    
+    {% elif query %}
+    <div class="text-center py-12">
+        <i class="fas fa-search text-6xl text-gray-300 mb-4"></i>
+        <h3 class="text-xl font-semibold text-gray-600 mb-2">No posts found</h3>
+        <p class="text-gray-500 mb-4">Try searching with different keywords.</p>
+        <a href="{% url 'posts:explore' %}" class="btn-primary">
+            Explore All Posts
+        </a>
+    </div>
+    
+    {% else %}
+    <div class="text-center py-12">
+        <i class="fas fa-search text-6xl text-gray-300 mb-4"></i>
+        <h3 class="text-xl font-semibold text-gray-600 mb-2">Search for posts</h3>
+        <p class="text-gray-500">Enter keywords to find posts you're looking for.</p>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+</style>
+{% endblock %}

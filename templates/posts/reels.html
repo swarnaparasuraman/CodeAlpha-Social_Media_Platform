@@ -1,0 +1,631 @@
+{% extends 'base.html' %}
+
+{% block title %}Reels - Glintz{% endblock %}
+
+{% block content %}
+{% csrf_token %}
+<div class="bg-black min-h-screen overflow-hidden">
+    <!-- Mobile Header -->
+    <div class="lg:hidden bg-black/60 backdrop-blur-md px-6 py-4 fixed top-0 left-0 right-0 z-50">
+        <div class="flex items-center justify-between">
+            <a href="{% url 'posts:feed' %}" class="text-white/90 hover:text-white transition-colors">
+                <i data-lucide="arrow-left" class="w-6 h-6"></i>
+            </a>
+            <div class="flex space-x-4">
+                <button class="text-white/90 hover:text-white transition-colors">
+                    <i data-lucide="search" class="w-6 h-6"></i>
+                </button>
+                <button class="text-white/90 hover:text-white transition-colors">
+                    <i data-lucide="camera" class="w-6 h-6"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Desktop Sidebar -->
+    <div class="hidden lg:block fixed left-0 top-0 h-full w-64 bg-black/90 backdrop-blur-sm border-r border-gray-800 z-40">
+        <div class="p-6">
+            <!-- Logo -->
+            <div class="mb-8">
+                <h1 class="text-2xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-orange-400 bg-clip-text text-transparent">Glintz</h1>
+            </div>
+            
+            <!-- Navigation Menu -->
+            <nav class="space-y-2">
+                <a href="{% url 'posts:feed' %}" class="flex items-center space-x-3 px-3 py-3 rounded-lg hover:bg-gray-800 text-gray-300">
+                    <i data-lucide="home" class="w-6 h-6"></i>
+                    <span>Home</span>
+                </a>
+                <a href="{% url 'accounts:search_users' %}" class="flex items-center space-x-3 px-3 py-3 rounded-lg hover:bg-gray-800 text-gray-300">
+                    <i data-lucide="search" class="w-6 h-6"></i>
+                    <span>Search</span>
+                </a>
+                <a href="{% url 'posts:explore' %}" class="flex items-center space-x-3 px-3 py-3 rounded-lg hover:bg-gray-800 text-gray-300">
+                    <i data-lucide="compass" class="w-6 h-6"></i>
+                    <span>Explore</span>
+                </a>
+                <a href="{% url 'posts:reels' %}" class="flex items-center space-x-3 px-3 py-3 rounded-lg bg-gray-800 text-white font-medium">
+                    <i data-lucide="video" class="w-6 h-6"></i>
+                    <span>Reels</span>
+                </a>
+                <a href="#" class="flex items-center space-x-3 px-3 py-3 rounded-lg hover:bg-gray-800 text-gray-300">
+                    <i data-lucide="send" class="w-6 h-6"></i>
+                    <span>Messages</span>
+                </a>
+                <a href="{% url 'social:notifications' %}" class="flex items-center space-x-3 px-3 py-3 rounded-lg hover:bg-gray-800 text-gray-300">
+                    <i data-lucide="heart" class="w-6 h-6"></i>
+                    <span>Notifications</span>
+                </a>
+                <a href="{% url 'posts:create' %}" class="flex items-center space-x-3 px-3 py-3 rounded-lg hover:bg-gray-800 text-gray-300">
+                    <i data-lucide="plus-square" class="w-6 h-6"></i>
+                    <span>Create</span>
+                </a>
+                <a href="{% url 'accounts:profile' user.username %}" class="flex items-center space-x-3 px-3 py-3 rounded-lg hover:bg-gray-800 text-gray-300">
+                    <img src="{{ user.profile.profile_picture.url }}" alt="Profile" class="w-6 h-6 rounded-full object-cover">
+                    <span>Profile</span>
+                </a>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Main Reels Container -->
+    <div class="lg:ml-64 pt-16 lg:pt-0">
+        <div class="relative h-screen overflow-hidden">
+            <!-- Reels Scroll Container -->
+            <div id="reels-container" class="h-full overflow-y-auto snap-y snap-mandatory scrollbar-hide">
+                {% for post in reels %}
+                <div class="reel-item h-screen w-full snap-start relative flex items-center justify-center" data-reel-id="{{ post.id }}">
+                    <!-- Reel Background -->
+                    <div class="absolute inset-0">
+                        {% if post.image %}
+                            <img src="{{ post.image.url }}" 
+                                 alt="Reel background" 
+                                 class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-black/20"></div>
+                        {% else %}
+                            <!-- Gradient background for text-only reels -->
+                            <div class="w-full h-full bg-gradient-to-br from-purple-600 via-pink-600 to-orange-600"></div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Reel Content -->
+                    <div class="relative z-10 w-full h-full flex flex-col">
+                        <!-- Main Content Area -->
+                        <div class="flex-1 flex items-center justify-center px-8">
+                            {% if not post.image %}
+                                <!-- Text Content for text-only reels -->
+                                <div class="text-center max-w-2xl">
+                                    <h2 class="text-5xl md:text-6xl font-black text-white leading-tight drop-shadow-2xl tracking-tight">
+                                        {{ post.content|truncatewords:8 }}
+                                    </h2>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Bottom Info Panel -->
+                        <div class="absolute bottom-28 left-8 right-24">
+                            <!-- Author Info -->
+                            <div class="flex items-center space-x-5 mb-8">
+                                <div class="relative">
+                                    <div class="w-16 h-16 rounded-full p-0.5 bg-gradient-to-tr from-pink-500 via-purple-500 to-cyan-500">
+                                        <img src="{{ post.author.profile.profile_picture.url }}"
+                                             alt="{{ post.author.username }}"
+                                             class="w-full h-full rounded-full border-2 border-black object-cover">
+                                    </div>
+                                    {% if post.author.profile.verified %}
+                                    <div class="absolute -bottom-1 -right-1 w-7 h-7 bg-blue-500 rounded-full border-3 border-black flex items-center justify-center shadow-lg">
+                                        <i data-lucide="check" class="w-4 h-4 text-white"></i>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex items-center space-x-4">
+                                        <span class="font-black text-white text-xl drop-shadow-2xl tracking-wide">{{ post.author.username }}</span>
+                                        <button class="px-8 py-2.5 bg-white text-black font-black rounded-full text-sm hover:bg-gray-100 transition-all duration-200 shadow-xl hover:scale-105">
+                                            Follow
+                                        </button>
+                                    </div>
+                                    <p class="text-white/90 text-sm font-bold drop-shadow-lg mt-1">{{ post.time_since_posted }}</p>
+                                </div>
+                            </div>
+
+                            <!-- Caption -->
+                            {% if post.content and post.image %}
+                            <div class="mb-6">
+                                <p class="text-white text-lg leading-relaxed drop-shadow-2xl font-semibold">
+                                    <span class="font-black">{{ post.author.username }}</span> {{ post.content|truncatewords:12 }}
+                                </p>
+                            </div>
+                            {% endif %}
+
+                            <!-- Hashtags -->
+                            <div class="flex flex-wrap gap-4">
+                                <span class="text-cyan-300 text-base font-black drop-shadow-lg">#trending</span>
+                                <span class="text-pink-300 text-base font-black drop-shadow-lg">#viral</span>
+                                <span class="text-purple-300 text-base font-black drop-shadow-lg">#glintz</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Action Panel -->
+                    <div class="absolute right-6 bottom-32 flex flex-col items-center space-y-6">
+                        <!-- Like Button -->
+                        <button class="like-btn action-btn group" data-post-id="{{ post.id }}">
+                            <div class="w-16 h-16 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center border border-white/30 group-hover:bg-white/20 group-hover:scale-110 transition-all duration-300 shadow-2xl">
+                                <i data-lucide="heart" class="w-8 h-8 text-white group-hover:text-red-400 transition-colors duration-200"></i>
+                            </div>
+                            <span class="like-count text-white text-sm font-bold drop-shadow-2xl mt-2">{{ post.likes_count|floatformat:0 }}{% if post.likes_count > 999 %}k{% endif %}</span>
+                        </button>
+
+                        <!-- Comment Button -->
+                        <button class="action-btn group">
+                            <div class="w-16 h-16 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center border border-white/30 group-hover:bg-white/20 group-hover:scale-110 transition-all duration-300 shadow-2xl">
+                                <i data-lucide="message-circle" class="w-8 h-8 text-white group-hover:text-blue-400 transition-colors duration-200"></i>
+                            </div>
+                            <span class="text-white text-sm font-bold drop-shadow-2xl mt-2">{{ post.comments_count|floatformat:0 }}{% if post.comments_count > 999 %}k{% endif %}</span>
+                        </button>
+
+                        <!-- Share Button -->
+                        <button class="action-btn group">
+                            <div class="w-16 h-16 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center border border-white/30 group-hover:bg-white/20 group-hover:scale-110 transition-all duration-300 shadow-2xl">
+                                <i data-lucide="send" class="w-8 h-8 text-white group-hover:text-green-400 transition-colors duration-200"></i>
+                            </div>
+                        </button>
+
+                        <!-- Save Button -->
+                        <button class="action-btn group">
+                            <div class="w-16 h-16 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center border border-white/30 group-hover:bg-white/20 group-hover:scale-110 transition-all duration-300 shadow-2xl">
+                                <i data-lucide="bookmark" class="w-8 h-8 text-white group-hover:text-yellow-400 transition-colors duration-200"></i>
+                            </div>
+                        </button>
+
+                        <!-- More Options -->
+                        <button class="action-btn group">
+                            <div class="w-16 h-16 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center border border-white/30 group-hover:bg-white/20 group-hover:scale-110 transition-all duration-300 shadow-2xl">
+                                <i data-lucide="more-horizontal" class="w-8 h-8 text-white group-hover:text-purple-400 transition-colors duration-200"></i>
+                            </div>
+                        </button>
+                    </div>
+
+                    <!-- Progress Indicator -->
+                    <div class="absolute top-8 left-6 right-6 z-20">
+                        <div class="flex space-x-2">
+                            {% for i in "123" %}
+                            <div class="flex-1 h-1.5 bg-white/20 rounded-full overflow-hidden backdrop-blur-sm shadow-lg">
+                                <div class="h-full bg-gradient-to-r from-pink-400 via-purple-400 to-cyan-400 rounded-full progress-bar shadow-lg" style="width: 0%"></div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <!-- Empty State -->
+                <div class="h-screen flex items-center justify-center">
+                    <div class="text-center">
+                        <div class="w-24 h-24 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                            <i data-lucide="video" class="w-12 h-12 text-white"></i>
+                        </div>
+                        <h3 class="text-2xl font-semibold text-white mb-4">No reels yet</h3>
+                        <p class="text-gray-300 mb-8 max-w-md mx-auto">
+                            Be the first to create an amazing reel!
+                        </p>
+                        <a href="{% url 'posts:create' %}" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-200">
+                            <i data-lucide="plus" class="w-5 h-5 mr-2"></i>
+                            Create Reel
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Bottom Navigation -->
+    <div class="lg:hidden fixed bottom-0 left-0 right-0 bg-black/80 backdrop-blur-sm border-t border-gray-800 z-50">
+        <div class="flex items-center justify-around py-2">
+            <a href="{% url 'posts:feed' %}" class="p-3 text-gray-400">
+                <i data-lucide="home" class="w-6 h-6"></i>
+            </a>
+            <a href="{% url 'accounts:search_users' %}" class="p-3 text-gray-400">
+                <i data-lucide="search" class="w-6 h-6"></i>
+            </a>
+            <a href="{% url 'posts:create' %}" class="p-3 text-gray-400">
+                <i data-lucide="plus-square" class="w-6 h-6"></i>
+            </a>
+            <a href="{% url 'posts:reels' %}" class="p-3 text-white">
+                <i data-lucide="video" class="w-6 h-6"></i>
+            </a>
+            <a href="{% url 'accounts:profile' user.username %}" class="p-3 text-gray-400">
+                <img src="{{ user.profile.profile_picture.url }}" alt="Profile" class="w-6 h-6 rounded-full object-cover">
+            </a>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<!-- Lucide Icons -->
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Lucide icons
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+
+    const reelsContainer = document.getElementById('reels-container');
+    const reelItems = document.querySelectorAll('.reel-item');
+    let currentReelIndex = 0;
+    let isScrolling = false;
+    let progressTimeout;
+
+    // Auto-progress for current reel
+    function startProgress(reelElement) {
+        if (!reelElement) return;
+
+        const progressBars = reelElement.querySelectorAll('.progress-bar');
+        let currentBar = 0;
+
+        function animateBar() {
+            if (currentBar < progressBars.length) {
+                const bar = progressBars[currentBar];
+                if (bar) {
+                    bar.style.transition = 'width 3s linear';
+                    bar.style.width = '100%';
+
+                    progressTimeout = setTimeout(() => {
+                        currentBar++;
+                        if (currentBar < progressBars.length) {
+                            animateBar();
+                        } else {
+                            // Auto-scroll to next reel
+                            setTimeout(() => {
+                                scrollToNextReel();
+                            }, 500);
+                        }
+                    }, 3000);
+                }
+            }
+        }
+
+        animateBar();
+    }
+
+    // Reset progress bars
+    function resetProgress(reelElement) {
+        if (!reelElement) return;
+
+        clearTimeout(progressTimeout);
+        const progressBars = reelElement.querySelectorAll('.progress-bar');
+        progressBars.forEach(bar => {
+            bar.style.transition = 'none';
+            bar.style.width = '0%';
+        });
+    }
+
+    // Reset all progress bars
+    function resetAllProgress() {
+        reelItems.forEach(reel => resetProgress(reel));
+    }
+
+    // Scroll to next reel
+    function scrollToNextReel() {
+        if (currentReelIndex < reelItems.length - 1) {
+            currentReelIndex++;
+        } else {
+            currentReelIndex = 0; // Loop back to first
+        }
+        scrollToReel(currentReelIndex);
+    }
+
+    // Scroll to previous reel
+    function scrollToPrevReel() {
+        if (currentReelIndex > 0) {
+            currentReelIndex--;
+        } else {
+            currentReelIndex = reelItems.length - 1; // Loop to last
+        }
+        scrollToReel(currentReelIndex);
+    }
+
+    // Scroll to specific reel
+    function scrollToReel(index) {
+        if (isScrolling || index < 0 || index >= reelItems.length) return;
+
+        isScrolling = true;
+        const targetReel = reelItems[index];
+
+        if (targetReel) {
+            resetAllProgress();
+
+            targetReel.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+
+            setTimeout(() => {
+                startProgress(targetReel);
+                isScrolling = false;
+            }, 500);
+        }
+    }
+
+    // Handle scroll events
+    let scrollTimeout;
+    if (reelsContainer) {
+        reelsContainer.addEventListener('scroll', function() {
+            clearTimeout(scrollTimeout);
+            scrollTimeout = setTimeout(() => {
+                if (isScrolling) return;
+
+                const containerRect = reelsContainer.getBoundingClientRect();
+                const containerCenter = containerRect.top + containerRect.height / 2;
+
+                reelItems.forEach((reel, index) => {
+                    const reelRect = reel.getBoundingClientRect();
+                    const reelCenter = reelRect.top + reelRect.height / 2;
+
+                    if (Math.abs(reelCenter - containerCenter) < containerRect.height / 4) {
+                        if (currentReelIndex !== index) {
+                            currentReelIndex = index;
+                            resetAllProgress();
+                            startProgress(reelItems[currentReelIndex]);
+                        }
+                    }
+                });
+            }, 200);
+        });
+    }
+
+    // Touch and click controls
+    reelItems.forEach((reel, index) => {
+        let touchStartY = 0;
+        let touchEndY = 0;
+
+        // Touch events for mobile
+        reel.addEventListener('touchstart', (e) => {
+            touchStartY = e.changedTouches[0].screenY;
+        }, { passive: true });
+
+        reel.addEventListener('touchend', (e) => {
+            touchEndY = e.changedTouches[0].screenY;
+            handleSwipe();
+        }, { passive: true });
+
+        // Click events for desktop
+        reel.addEventListener('click', (e) => {
+            // Don't trigger on action button clicks
+            if (e.target.closest('.action-btn')) return;
+
+            const rect = reel.getBoundingClientRect();
+            const clickY = e.clientY - rect.top;
+            const reelHeight = rect.height;
+
+            if (clickY < reelHeight / 2) {
+                scrollToPrevReel();
+            } else {
+                scrollToNextReel();
+            }
+        });
+
+        function handleSwipe() {
+            const swipeThreshold = 50;
+            const diff = touchStartY - touchEndY;
+
+            if (Math.abs(diff) > swipeThreshold) {
+                if (diff > 0) {
+                    scrollToNextReel(); // Swipe up
+                } else {
+                    scrollToPrevReel(); // Swipe down
+                }
+            }
+        }
+    });
+
+    // Keyboard controls
+    document.addEventListener('keydown', (e) => {
+        switch(e.key) {
+            case 'ArrowUp':
+                e.preventDefault();
+                scrollToPrevReel();
+                break;
+            case 'ArrowDown':
+            case ' ':
+                e.preventDefault();
+                scrollToNextReel();
+                break;
+        }
+    });
+
+    // Like functionality
+    document.querySelectorAll('.like-btn').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const postId = this.getAttribute('data-post-id');
+            const heartIcon = this.querySelector('i[data-lucide="heart"]');
+            const countSpan = this.querySelector('.like-count');
+
+            // Call the like API
+            fetch(`/posts/${postId}/like/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Update heart icon
+                if (heartIcon) {
+                    if (data.is_liked) {
+                        // Liked state - red heart with fill
+                        heartIcon.setAttribute('style', 'color: #ef4444 !important; fill: #ef4444 !important;');
+                        heartIcon.classList.add('text-red-500');
+                        heartIcon.classList.remove('text-white', 'group-hover:text-red-400');
+                    } else {
+                        // Unliked state - white heart
+                        heartIcon.setAttribute('style', 'color: #ffffff !important; fill: none !important;');
+                        heartIcon.classList.remove('text-red-500');
+                        heartIcon.classList.add('text-white', 'group-hover:text-red-400');
+                    }
+
+                    // Add bounce animation
+                    heartIcon.classList.add('animate-bounce');
+                    setTimeout(() => {
+                        heartIcon.classList.remove('animate-bounce');
+                    }, 600);
+                }
+
+                // Update count
+                if (countSpan) {
+                    countSpan.textContent = data.likes_count > 999 ?
+                        Math.floor(data.likes_count / 1000) + 'k' :
+                        data.likes_count;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Fallback animation even if API fails
+                if (heartIcon) {
+                    heartIcon.setAttribute('style', 'color: #ef4444 !important; fill: #ef4444 !important;');
+                    heartIcon.classList.add('animate-bounce', 'text-red-500');
+                    heartIcon.classList.remove('text-white');
+                    setTimeout(() => {
+                        heartIcon.classList.remove('animate-bounce');
+                    }, 600);
+                }
+
+                // Update count optimistically
+                if (countSpan) {
+                    const currentCount = parseInt(countSpan.textContent.replace('k', '000')) || 0;
+                    const newCount = currentCount + 1;
+                    countSpan.textContent = newCount > 999 ?
+                        Math.floor(newCount / 1000) + 'k' :
+                        newCount;
+                }
+            });
+        });
+    });
+
+    // Initialize first reel
+    if (reelItems.length > 0) {
+        setTimeout(() => {
+            startProgress(reelItems[0]);
+        }, 1000);
+    }
+});
+</script>
+
+<style>
+/* Hide scrollbar */
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+
+/* Smooth scroll behavior */
+.snap-y {
+    scroll-snap-type: y mandatory;
+}
+
+.snap-start {
+    scroll-snap-align: start;
+}
+
+/* Animations */
+@keyframes bounce {
+    0%, 20%, 53%, 80%, 100% {
+        transform: translate3d(0,0,0);
+    }
+    40%, 43% {
+        transform: translate3d(0,-15px,0);
+    }
+    70% {
+        transform: translate3d(0,-7px,0);
+    }
+    90% {
+        transform: translate3d(0,-2px,0);
+    }
+}
+
+.animate-bounce {
+    animation: bounce 0.6s ease-in-out;
+}
+
+/* Gradient backgrounds */
+.bg-gradient-to-r {
+    background: linear-gradient(to right, var(--tw-gradient-stops));
+}
+
+.bg-gradient-to-br {
+    background: linear-gradient(to bottom right, var(--tw-gradient-stops));
+}
+
+.bg-clip-text {
+    -webkit-background-clip: text;
+    background-clip: text;
+}
+
+.text-transparent {
+    color: transparent;
+}
+
+/* Backdrop blur support */
+.backdrop-blur-sm {
+    backdrop-filter: blur(4px);
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .lg\:ml-64 {
+        margin-left: 0;
+    }
+}
+
+/* Smooth transitions */
+.transition-all {
+    transition: all 0.3s ease-in-out;
+}
+
+/* Enhanced hover effects */
+.group:hover .group-hover\:scale-110 {
+    transform: scale(1.1);
+}
+
+.group:hover .group-hover\:bg-black\/60 {
+    background-color: rgba(0, 0, 0, 0.6);
+}
+
+/* Drop shadow for text */
+.drop-shadow-lg {
+    filter: drop-shadow(0 10px 8px rgb(0 0 0 / 0.04)) drop-shadow(0 4px 3px rgb(0 0 0 / 0.1));
+}
+
+/* Heart icon styling for reels */
+[data-lucide="heart"] {
+    transition: all 0.2s ease-in-out;
+}
+
+[data-lucide="heart"].text-red-500 {
+    color: #ef4444 !important;
+    fill: #ef4444 !important;
+}
+
+/* Like button animations */
+.like-animation {
+    animation: likeAnimation 0.6s ease-in-out;
+}
+
+@keyframes likeAnimation {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+}
+</style>
+{% endblock %}

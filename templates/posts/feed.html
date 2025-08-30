@@ -1,0 +1,664 @@
+{% extends 'base.html' %}
+
+{% block title %}Glintz{% endblock %}
+
+{% block content %}
+<div class="bg-gray-50 min-h-screen">
+    {% csrf_token %}
+
+    <!-- Mobile Header (visible on small screens) -->
+    <div class="lg:hidden bg-white border-b border-gray-200 px-4 py-3 fixed top-0 left-0 right-0 z-50">
+        <div class="flex items-center justify-between">
+            <h1 class="text-xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 bg-clip-text text-transparent">Glintz</h1>
+            <div class="flex items-center space-x-4">
+                <button class="p-2 hover:bg-gray-100 rounded-full">
+                    <i data-lucide="heart" class="w-6 h-6 text-gray-700"></i>
+                </button>
+                <button class="p-2 hover:bg-gray-100 rounded-full">
+                    <i data-lucide="send" class="w-6 h-6 text-gray-700"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Bottom Navigation -->
+    <div class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50">
+        <div class="flex items-center justify-around py-2">
+            <a href="{% url 'posts:feed' %}" class="p-3 text-gray-900">
+                <i data-lucide="home" class="w-6 h-6"></i>
+            </a>
+            <a href="{% url 'accounts:search_users' %}" class="p-3 text-gray-600">
+                <i data-lucide="search" class="w-6 h-6"></i>
+            </a>
+            <a href="{% url 'posts:create' %}" class="p-3 text-gray-600">
+                <i data-lucide="plus-square" class="w-6 h-6"></i>
+            </a>
+            <a href="{% url 'posts:reels' %}" class="p-3 text-gray-600">
+                <i data-lucide="video" class="w-6 h-6"></i>
+            </a>
+            <a href="{% url 'accounts:profile' user.username %}" class="p-3 text-gray-600">
+                <img src="{{ user.profile.profile_picture.url }}" alt="Profile" class="w-6 h-6 rounded-full object-cover">
+            </a>
+        </div>
+    </div>
+
+    <!-- Instagram-style Layout -->
+    <div class="flex pt-16 lg:pt-0 pb-16 lg:pb-0">
+        <!-- Left Sidebar Navigation -->
+        <div class="fixed left-0 top-0 h-full w-64 bg-white border-r border-gray-200 z-40 hidden lg:block">
+            <div class="p-6">
+                <!-- Logo -->
+                <div class="mb-8">
+                    <h1 class="text-2xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 bg-clip-text text-transparent">Glintz</h1>
+                </div>
+
+                <!-- Navigation Menu -->
+                <nav class="space-y-2">
+                    <a href="{% url 'posts:feed' %}" class="flex items-center space-x-3 px-3 py-3 rounded-lg hover:bg-gray-100 text-gray-900 font-medium">
+                        <i data-lucide="home" class="w-6 h-6"></i>
+                        <span>Home</span>
+                    </a>
+                    <a href="{% url 'accounts:search_users' %}" class="flex items-center space-x-3 px-3 py-3 rounded-lg hover:bg-gray-100 text-gray-600">
+                        <i data-lucide="search" class="w-6 h-6"></i>
+                        <span>Search</span>
+                    </a>
+                    <a href="{% url 'posts:explore' %}" class="flex items-center space-x-3 px-3 py-3 rounded-lg hover:bg-gray-100 text-gray-600">
+                        <i data-lucide="compass" class="w-6 h-6"></i>
+                        <span>Explore</span>
+                    </a>
+                    <a href="{% url 'posts:reels' %}" class="flex items-center space-x-3 px-3 py-3 rounded-lg hover:bg-gray-100 text-gray-600">
+                        <i data-lucide="video" class="w-6 h-6"></i>
+                        <span>Reels</span>
+                    </a>
+                    <a href="{% url 'social:messages' %}" class="flex items-center space-x-3 px-3 py-3 rounded-lg hover:bg-gray-100 text-gray-600">
+                        <i data-lucide="send" class="w-6 h-6"></i>
+                        <span>Messages</span>
+                    </a>
+                    <a href="{% url 'social:notifications' %}" class="flex items-center space-x-3 px-3 py-3 rounded-lg hover:bg-gray-100 text-gray-600">
+                        <i data-lucide="heart" class="w-6 h-6"></i>
+                        <span>Notifications</span>
+                    </a>
+                    <a href="{% url 'posts:create' %}" class="flex items-center space-x-3 px-3 py-3 rounded-lg hover:bg-gray-100 text-gray-600">
+                        <i data-lucide="plus-square" class="w-6 h-6"></i>
+                        <span>Create</span>
+                    </a>
+                    <a href="{% url 'accounts:profile' user.username %}" class="flex items-center space-x-3 px-3 py-3 rounded-lg hover:bg-gray-100 text-gray-600">
+                        <img src="{{ user.profile.profile_picture.url }}" alt="Profile" class="w-6 h-6 rounded-full object-cover">
+                        <span>Profile</span>
+                    </a>
+                </nav>
+
+                <!-- More Menu -->
+                <div class="absolute bottom-6 left-6 right-6">
+                    <a href="#" class="flex items-center space-x-3 px-3 py-3 rounded-lg hover:bg-gray-100 text-gray-600">
+                        <i data-lucide="menu" class="w-6 h-6"></i>
+                        <span>More</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="flex-1 lg:ml-64">
+            <div class="max-w-4xl mx-auto px-4 py-4 lg:py-8">
+                <div class="flex gap-8">
+                    <!-- Feed Column -->
+                    <div class="flex-1 max-w-lg mx-auto lg:mx-0">
+
+                <!-- Stories Section -->
+                <div class="bg-white border border-gray-200 rounded-lg p-4 mb-6">
+                    <div class="flex space-x-4 overflow-x-auto scrollbar-hide pb-2">
+                        <!-- Your Story -->
+                        <div class="flex-shrink-0 text-center cursor-pointer">
+                            <div class="relative">
+                                <div class="w-16 h-16 rounded-full p-0.5 bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-500">
+                                    <div class="w-full h-full rounded-full border-2 border-white overflow-hidden">
+                                        <img src="{{ user.profile.profile_picture.url }}" alt="Your story" class="w-full h-full object-cover">
+                                    </div>
+                                </div>
+                                <div class="absolute -bottom-1 -right-1 w-6 h-6 bg-blue-500 rounded-full border-2 border-white flex items-center justify-center">
+                                    <i data-lucide="plus" class="w-3 h-3 text-white"></i>
+                                </div>
+                            </div>
+                            <p class="text-xs text-gray-600 font-medium mt-2 max-w-[64px] truncate">Your story</p>
+                        </div>
+
+                        <!-- Friends' Stories -->
+                        {% for i in "123456789" %}
+                        <div class="flex-shrink-0 text-center cursor-pointer story-item" data-username="user{{ i }}">
+                            <div class="w-16 h-16 rounded-full p-0.5 bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-500 hover:scale-105 transition-transform">
+                                <div class="w-full h-full rounded-full border-2 border-white overflow-hidden">
+                                    <img src="https://picsum.photos/64/64?random={{ i }}" alt="Story" class="w-full h-full object-cover">
+                                </div>
+                            </div>
+                            <p class="text-xs text-gray-600 font-medium mt-2 max-w-[64px] truncate">user{{ i }}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Instagram-Like Posts Feed -->
+                {% if page_obj %}
+                    {% for post in page_obj %}
+                    <div class="post-card mb-6 bg-white border border-gray-200 rounded-lg overflow-hidden instagram-hover">
+                        <!-- Post Header -->
+                        <div class="post-header p-4 pb-0">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <a href="{% url 'accounts:profile' post.author.username %}">
+                                        <img src="{{ post.author.profile.profile_picture.url }}"
+                                             alt="{{ post.author.username }}"
+                                             class="w-8 h-8 rounded-full object-cover">
+                                    </a>
+                                    <div>
+                                        <div class="flex items-center space-x-1">
+                                            <a href="{% url 'accounts:profile' post.author.username %}"
+                                               class="font-semibold text-sm text-gray-900 hover:text-gray-600">
+                                                {{ post.author.username }}
+                                            </a>
+                                            {% if post.author.profile.verified %}
+                                            <i data-lucide="badge-check" class="w-3 h-3 text-blue-500"></i>
+                                            {% endif %}
+                                        </div>
+                                        <p class="text-xs text-gray-500">{{ post.time_since_posted }}</p>
+                                    </div>
+                                </div>
+
+                                {% if post.author == user %}
+                                <div class="relative group">
+                                    <button class="p-1 hover:bg-gray-50 rounded-full">
+                                        <i data-lucide="more-horizontal" class="w-5 h-5 text-gray-600"></i>
+                                    </button>
+                                    <div class="absolute right-0 mt-1 w-40 bg-white rounded-lg shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10">
+                                        <div class="p-1">
+                                            <a href="{% url 'posts:edit' post.pk %}" class="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md">
+                                                <i data-lucide="edit" class="w-4 h-4 mr-2"></i>Edit
+                                            </a>
+                                            <a href="{% url 'posts:delete' post.pk %}" class="flex items-center px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md">
+                                                <i data-lucide="trash-2" class="w-4 h-4 mr-2"></i>Delete
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Post Image -->
+                        {% if post.image %}
+                        <div class="post-content">
+                            <img src="{{ post.image.url }}"
+                                 alt="Post image"
+                                 class="w-full object-cover cursor-pointer image-modal"
+                                 data-image-url="{{ post.image.url }}">
+                        </div>
+                        {% endif %}
+
+                        <!-- Instagram-Like Post Actions -->
+                        <div class="post-actions p-4">
+                            <div class="flex items-center justify-between mb-3">
+                                <div class="flex items-center space-x-4">
+                                    <!-- Like Button -->
+                                    <button data-post-id="{{ post.pk }}" class="like-btn hover:opacity-50 transition-opacity">
+                                        {% if post.is_liked %}
+                                        <i data-lucide="heart" class="w-6 h-6 text-red-500 fill-current"></i>
+                                        {% else %}
+                                        <i data-lucide="heart" class="w-6 h-6 text-gray-700"></i>
+                                        {% endif %}
+                                    </button>
+
+                                    <!-- Comment Button -->
+                                    <a href="{% url 'posts:detail' post.pk %}" class="hover:opacity-50 transition-opacity">
+                                        <i data-lucide="message-circle" class="w-6 h-6 text-gray-700"></i>
+                                    </a>
+
+                                    <!-- Share Button -->
+                                    <button data-post-id="{{ post.pk }}" class="share-btn hover:opacity-50 transition-opacity">
+                                        <i data-lucide="send" class="w-6 h-6 text-gray-700"></i>
+                                    </button>
+                                </div>
+
+                                <!-- Save Button -->
+                                <button data-post-id="{{ post.pk }}" class="save-btn hover:opacity-50 transition-opacity">
+                                    <i data-lucide="bookmark" class="w-6 h-6 text-gray-700"></i>
+                                </button>
+                            </div>
+
+                            <!-- Likes Count -->
+                            <div class="mb-2">
+                                <span id="likes-count-{{ post.pk }}" class="font-semibold text-sm">{{ post.likes_count }} likes</span>
+                            </div>
+
+                            <!-- Post Caption -->
+                            {% if post.content %}
+                            <div class="mb-2">
+                                <span class="font-semibold text-sm">{{ post.author.username }}</span>
+                                <span class="text-sm ml-1">{{ post.content }}</span>
+                            </div>
+                            {% endif %}
+
+                            <!-- View Comments -->
+                            {% if post.comments_count > 0 %}
+                            <div class="mb-2">
+                                <a href="{% url 'posts:detail' post.pk %}" class="text-sm text-gray-500">
+                                    View all {{ post.comments_count }} comments
+                                </a>
+                            </div>
+                            {% endif %}
+
+                            <!-- Time -->
+                            <div class="text-xs text-gray-400 uppercase">
+                                {{ post.created_at|date:"M d, Y" }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <!-- Empty State -->
+                    <div class="text-center py-16">
+                        <div class="w-24 h-24 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                            <i data-lucide="camera" class="w-8 h-8 text-white"></i>
+                        </div>
+                        <h3 class="text-2xl font-semibold text-gray-800 mb-4">No posts yet</h3>
+                        <p class="text-gray-600 mb-8 max-w-md mx-auto">
+                            Start following people or create your first post to see content in your feed.
+                        </p>
+                        <div class="flex justify-center space-x-4">
+                            <a href="{% url 'posts:create' %}" class="btn btn-primary">
+                                <i data-lucide="plus" class="w-4 h-4"></i>
+                                Create Post
+                            </a>
+                            <a href="{% url 'accounts:search_users' %}" class="btn btn-secondary">
+                                <i data-lucide="users" class="w-4 h-4"></i>
+                                Find People
+                            </a>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <!-- Pagination -->
+                {% if page_obj.has_other_pages %}
+                <div class="flex justify-center mt-8">
+                    <div class="flex items-center space-x-2">
+                        {% if page_obj.has_previous %}
+                            <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-secondary">
+                                <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                                Previous
+                            </a>
+                        {% endif %}
+
+                        <span class="px-4 py-2 text-gray-600 bg-white rounded-lg border border-gray-200">
+                            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                        </span>
+
+                        {% if page_obj.has_next %}
+                            <a href="?page={{ page_obj.next_page_number }}" class="btn btn-secondary">
+                                Next
+                                <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+                    </div>
+
+                    <!-- Right Sidebar -->
+                    <div class="hidden xl:block w-80">
+                        <!-- User Profile Card -->
+                        <div class="bg-white rounded-lg border border-gray-200 p-4 mb-6">
+                            <div class="flex items-center space-x-3 mb-4">
+                                <img src="{{ user.profile.profile_picture.url }}" alt="{{ user.username }}" class="w-14 h-14 rounded-full object-cover">
+                                <div>
+                                    <h3 class="font-semibold text-gray-900">{{ user.username }}</h3>
+                                    <p class="text-sm text-gray-500">{{ user.get_full_name|default:user.username }}</p>
+                                </div>
+                                <button class="ml-auto text-blue-500 text-sm font-medium hover:text-blue-600">Switch</button>
+                            </div>
+                        </div>
+
+                        <!-- Suggestions for You -->
+                        <div class="bg-white rounded-lg border border-gray-200 p-4 mb-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="font-semibold text-gray-500">Suggested for you</h3>
+                                <a href="#" class="text-sm font-medium text-gray-900 hover:text-gray-600">See All</a>
+                            </div>
+
+                            <!-- Suggested Users -->
+                            {% for i in "12345" %}
+                            <div class="flex items-center space-x-3 mb-3">
+                                <img src="https://picsum.photos/40/40?random={{ i }}0" alt="User" class="w-10 h-10 rounded-full object-cover">
+                                <div class="flex-1">
+                                    <h4 class="font-medium text-sm text-gray-900">user{{ i }}{{ i }}</h4>
+                                    <p class="text-xs text-gray-500">Followed by user{{ i }} + 2 more</p>
+                                </div>
+                                <button class="text-blue-500 text-sm font-medium hover:text-blue-600">Follow</button>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Footer Links -->
+                        <div class="text-xs text-gray-400 space-y-1">
+                            <div class="flex flex-wrap gap-2">
+                                <a href="#" class="hover:underline">About</a>
+                                <a href="#" class="hover:underline">Help</a>
+                                <a href="#" class="hover:underline">Press</a>
+                                <a href="#" class="hover:underline">API</a>
+                                <a href="#" class="hover:underline">Jobs</a>
+                                <a href="#" class="hover:underline">Privacy</a>
+                                <a href="#" class="hover:underline">Terms</a>
+                            </div>
+                            <div class="flex flex-wrap gap-2">
+                                <a href="#" class="hover:underline">Locations</a>
+                                <a href="#" class="hover:underline">Language</a>
+                                <a href="#" class="hover:underline">Meta Verified</a>
+                            </div>
+                            <p class="mt-4">© 2025 GLINTZ FROM META</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// CSRF Token for Django
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// Like Post Function
+function likePost(postId) {
+    const csrftoken = getCookie('csrftoken');
+
+    fetch(`/posts/${postId}/like/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrftoken,
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        const likesCount = document.getElementById(`likes-count-${postId}`);
+        const heartIcon = document.querySelector(`button[data-post-id="${postId}"].like-btn i`);
+
+        if (likesCount) {
+            likesCount.textContent = `${data.likes_count} likes`;
+        }
+
+        if (heartIcon) {
+            if (data.is_liked) {
+                heartIcon.classList.add('text-red-500', 'fill-current');
+                heartIcon.classList.remove('text-gray-700');
+                heartIcon.classList.add('animate-heart');
+            } else {
+                heartIcon.classList.remove('text-red-500', 'fill-current');
+                heartIcon.classList.add('text-gray-700');
+            }
+
+            setTimeout(() => {
+                heartIcon.classList.remove('animate-heart');
+            }, 300);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('Error liking post. Please try again.');
+    });
+}
+
+// Open Image Modal
+function openImageModal(imageUrl) {
+    // Create modal overlay
+    const modal = document.createElement('div');
+    modal.className = 'fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 cursor-pointer';
+    modal.onclick = () => modal.remove();
+
+    // Create close button
+    const closeBtn = document.createElement('button');
+    closeBtn.innerHTML = '×';
+    closeBtn.className = 'absolute top-4 right-4 text-white text-4xl hover:text-gray-300 z-10';
+    closeBtn.onclick = () => modal.remove();
+
+    // Create image
+    const img = document.createElement('img');
+    img.src = imageUrl;
+    img.className = 'max-w-full max-h-full object-contain cursor-default';
+    img.onclick = (e) => e.stopPropagation();
+
+    modal.appendChild(closeBtn);
+    modal.appendChild(img);
+    document.body.appendChild(modal);
+
+    // Prevent body scroll
+    document.body.style.overflow = 'hidden';
+
+    // Remove modal on escape key
+    const handleEscape = (e) => {
+        if (e.key === 'Escape') {
+            modal.remove();
+            document.body.style.overflow = 'auto';
+            document.removeEventListener('keydown', handleEscape);
+        }
+    };
+    document.addEventListener('keydown', handleEscape);
+
+    // Restore body scroll when modal is removed
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            if (mutation.type === 'childList') {
+                mutation.removedNodes.forEach((node) => {
+                    if (node === modal) {
+                        document.body.style.overflow = 'auto';
+                        observer.disconnect();
+                    }
+                });
+            }
+        });
+    });
+    observer.observe(document.body, { childList: true });
+}
+
+// Initialize Lucide Icons and Event Listeners
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+
+    // Add smooth scrolling for stories
+    const storiesContainer = document.querySelector('.scrollbar-hide');
+    if (storiesContainer) {
+        storiesContainer.style.scrollBehavior = 'smooth';
+    }
+
+    // Add click handlers for story items
+    const storyItems = document.querySelectorAll('.story-item');
+    storyItems.forEach(item => {
+        item.addEventListener('click', function() {
+            const username = this.getAttribute('data-username');
+            openStoryViewer(username);
+        });
+    });
+
+    // Add event listeners for like buttons
+    const likeButtons = document.querySelectorAll('.like-btn');
+    likeButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const postId = this.getAttribute('data-post-id');
+            likePost(postId);
+        });
+    });
+
+    // Add event listeners for share buttons
+    const shareButtons = document.querySelectorAll('.share-btn');
+    shareButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const postId = this.getAttribute('data-post-id');
+            sharePost(postId);
+        });
+    });
+
+    // Add event listeners for save buttons
+    const saveButtons = document.querySelectorAll('.save-btn');
+    saveButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const postId = this.getAttribute('data-post-id');
+            savePost(postId);
+        });
+    });
+
+    // Add event listeners for image modals
+    const imageModals = document.querySelectorAll('.image-modal');
+    imageModals.forEach(img => {
+        img.addEventListener('click', function() {
+            const imageUrl = this.getAttribute('data-image-url');
+            openImageModal(imageUrl);
+        });
+    });
+});
+
+// Share functionality
+function sharePost(postId) {
+    if (navigator.share) {
+        navigator.share({
+            title: 'Check out this post on Glintz',
+            url: window.location.origin + `/posts/${postId}/`
+        });
+    } else {
+        // Fallback: copy to clipboard
+        const url = window.location.origin + `/posts/${postId}/`;
+        navigator.clipboard.writeText(url).then(() => {
+            // Show toast notification
+            showToast('Link copied to clipboard!');
+        });
+    }
+}
+
+// Save post functionality
+function savePost(postId) {
+    const csrftoken = getCookie('csrftoken');
+
+    fetch(`/posts/${postId}/save/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrftoken,
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        const saveIcon = document.querySelector(`button[onclick="savePost(${postId})"] i`);
+        if (saveIcon) {
+            if (data.is_saved) {
+                saveIcon.classList.add('fill-current');
+                showToast('Post saved!');
+            } else {
+                saveIcon.classList.remove('fill-current');
+                showToast('Post unsaved!');
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+
+// Story Viewer
+function openStoryViewer(username) {
+    // Create story viewer modal
+    const modal = document.createElement('div');
+    modal.className = 'fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50';
+
+    // Story container
+    const storyContainer = document.createElement('div');
+    storyContainer.className = 'relative w-full max-w-sm h-full max-h-screen bg-black rounded-lg overflow-hidden';
+
+    // Story header
+    const header = document.createElement('div');
+    header.className = 'absolute top-0 left-0 right-0 z-10 p-4 bg-gradient-to-b from-black/50 to-transparent';
+    header.innerHTML = `
+        <div class="flex items-center justify-between text-white">
+            <div class="flex items-center space-x-3">
+                <div class="w-8 h-8 rounded-full border-2 border-white overflow-hidden">
+                    <img src="https://picsum.photos/32/32?random=${Math.floor(Math.random() * 100)}" alt="${username}" class="w-full h-full object-cover">
+                </div>
+                <span class="font-medium">${username}</span>
+                <span class="text-sm opacity-75">2h</span>
+            </div>
+            <button onclick="this.closest('.fixed').remove()" class="text-white text-2xl">&times;</button>
+        </div>
+        <div class="mt-2 h-1 bg-white/30 rounded-full overflow-hidden">
+            <div class="h-full bg-white rounded-full story-progress" style="width: 0%"></div>
+        </div>
+    `;
+
+    // Story content
+    const content = document.createElement('div');
+    content.className = 'w-full h-full flex items-center justify-center';
+    content.innerHTML = `
+        <img src="https://picsum.photos/400/600?random=${Math.floor(Math.random() * 100)}" alt="Story" class="w-full h-full object-cover">
+    `;
+
+    storyContainer.appendChild(header);
+    storyContainer.appendChild(content);
+    modal.appendChild(storyContainer);
+    document.body.appendChild(modal);
+
+    // Animate progress bar
+    const progressBar = modal.querySelector('.story-progress');
+    let progress = 0;
+    const interval = setInterval(() => {
+        progress += 2;
+        progressBar.style.width = progress + '%';
+        if (progress >= 100) {
+            clearInterval(interval);
+            modal.remove();
+        }
+    }, 100);
+
+    // Close on click outside
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            clearInterval(interval);
+            modal.remove();
+        }
+    });
+
+    // Close on escape
+    const handleEscape = (e) => {
+        if (e.key === 'Escape') {
+            clearInterval(interval);
+            modal.remove();
+            document.removeEventListener('keydown', handleEscape);
+        }
+    };
+    document.addEventListener('keydown', handleEscape);
+}
+
+// Toast notification
+function showToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-4 py-2 rounded-lg z-50';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+        toast.remove();
+    }, 3000);
+}
+</script>
+{% endblock %}

@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+
+{% block title %}Create New Post - Glintz{% endblock %}
+
+{% block content %}
+<div class="bg-gray-50 min-h-screen">
+    <div class="max-w-lg mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="bg-white border border-gray-200 rounded-lg mb-6">
+            <div class="flex items-center justify-between p-4 border-b border-gray-200">
+                <a href="{% url 'posts:feed' %}" class="text-gray-600 hover:text-gray-800">
+                    <i data-lucide="arrow-left" class="w-6 h-6"></i>
+                </a>
+                <h1 class="text-lg font-semibold text-gray-900">Create new post</h1>
+                <button type="submit" form="create-post-form" class="text-blue-500 font-semibold hover:text-blue-600">
+                    Share
+                </button>
+            </div>
+
+            <!-- Create Post Form -->
+            <form id="create-post-form" method="post" enctype="multipart/form-data" class="p-4">
+                {% csrf_token %}
+
+                <!-- User Info -->
+                <div class="flex items-center space-x-3 mb-4">
+                    <img src="{{ user.profile.profile_picture.url }}"
+                         alt="{{ user.username }}"
+                         class="w-8 h-8 rounded-full object-cover">
+                    <span class="font-semibold text-sm text-gray-900">{{ user.username }}</span>
+                </div>
+
+                <!-- Image Upload Area -->
+                <div class="mb-4">
+                    <div id="image-preview" class="hidden mb-4">
+                        <div class="relative">
+                            <img id="preview-img" class="w-full object-cover rounded-lg" alt="Preview">
+                            <button type="button" id="remove-image" class="absolute top-2 right-2 bg-black bg-opacity-50 text-white rounded-full p-1 hover:bg-opacity-70">
+                                <i data-lucide="x" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="upload-area" class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-gray-400 transition-colors cursor-pointer">
+                        <i data-lucide="image" class="w-12 h-12 text-gray-400 mx-auto mb-4"></i>
+                        <p class="text-gray-600 mb-2">Drag photos here</p>
+                        <button type="button" class="btn btn-primary btn-sm">
+                            Select from computer
+                        </button>
+                        <input type="file" id="{{ form.image.id_for_label }}" name="image" accept="image/*" class="hidden">
+                    </div>
+                    {% if form.image.errors %}
+                        <p class="mt-2 text-sm text-red-600">{{ form.image.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Caption -->
+                <div class="mb-4">
+                    <textarea
+                        id="{{ form.content.id_for_label }}"
+                        name="content"
+                        placeholder="Write a caption..."
+                        class="w-full p-3 border border-gray-200 rounded-lg resize-none focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                        rows="4"></textarea>
+                    {% if form.content.errors %}
+                        <p class="mt-2 text-sm text-red-600">{{ form.content.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Additional Options -->
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+                        <div class="flex items-center space-x-3">
+                            <i data-lucide="map-pin" class="w-5 h-5 text-gray-600"></i>
+                            <span class="text-sm text-gray-900">Add location</span>
+                        </div>
+                        <i data-lucide="chevron-right" class="w-4 h-4 text-gray-400"></i>
+                    </div>
+
+                    <div class="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+                        <div class="flex items-center space-x-3">
+                            <i data-lucide="users" class="w-5 h-5 text-gray-600"></i>
+                            <span class="text-sm text-gray-900">Tag people</span>
+                        </div>
+                        <i data-lucide="chevron-right" class="w-4 h-4 text-gray-400"></i>
+                    </div>
+
+                    <div class="flex items-center justify-between p-3">
+                        <div class="flex items-center space-x-3">
+                            <i data-lucide="settings" class="w-5 h-5 text-gray-600"></i>
+                            <span class="text-sm text-gray-900">Advanced settings</span>
+                        </div>
+                        <i data-lucide="chevron-right" class="w-4 h-4 text-gray-400"></i>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const uploadArea = document.getElementById('upload-area');
+    const fileInput = document.getElementById('{{ form.image.id_for_label }}');
+    const imagePreview = document.getElementById('image-preview');
+    const previewImg = document.getElementById('preview-img');
+    const removeImageBtn = document.getElementById('remove-image');
+
+    // Initialize Lucide icons
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+
+    // Click to upload
+    uploadArea.addEventListener('click', () => {
+        fileInput.click();
+    });
+
+    // File input change
+    fileInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImg.src = e.target.result;
+                imagePreview.classList.remove('hidden');
+                uploadArea.classList.add('hidden');
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Remove image
+    removeImageBtn.addEventListener('click', function() {
+        fileInput.value = '';
+        imagePreview.classList.add('hidden');
+        uploadArea.classList.remove('hidden');
+    });
+
+    // Drag and drop
+    uploadArea.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        uploadArea.classList.add('border-blue-400', 'bg-blue-50');
+    });
+
+    uploadArea.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        uploadArea.classList.remove('border-blue-400', 'bg-blue-50');
+    });
+
+    uploadArea.addEventListener('drop', function(e) {
+        e.preventDefault();
+        uploadArea.classList.remove('border-blue-400', 'bg-blue-50');
+
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            const file = files[0];
+            if (file.type.startsWith('image/')) {
+                fileInput.files = files;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImg.src = e.target.result;
+                    imagePreview.classList.remove('hidden');
+                    uploadArea.classList.add('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+    });
+});
+</script>
+{% endblock %}
